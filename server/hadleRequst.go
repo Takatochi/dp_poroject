@@ -37,10 +37,8 @@ func (s *Server) RequestTemplate(maineroot string, handlename string, tmp []stri
 	http.HandleFunc(s.handlename, s.index)
 
 }
-/// 
 func (s *Server) index(w http.ResponseWriter, r *http.Request) {
-	//старт темлейтов для метода index (головна сторінка)
-
+	
 	t, err := template.ParseFiles(s.tmp[0])
 	for i := 1; i < len(s.tmp); i++ {
 		t.ParseFiles(s.tmp[i])
