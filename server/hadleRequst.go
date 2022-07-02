@@ -37,6 +37,7 @@ func (s *Server) RequestTemplate(maineroot string, handlename string, tmp []stri
 	http.HandleFunc(s.handlename, s.index)
 
 }
+/// dadd
 func (s *Server) index(w http.ResponseWriter, r *http.Request) {
 	//старт темлейтов для метода index (головна сторінка)
 
