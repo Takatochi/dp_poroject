@@ -13,22 +13,19 @@ func main() {
 		log.Fatal(err)
 	}
 
-	//провірка директорії
-	// dir, err := os.Getwd()
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// fmt.Println(dir)
 }
 func run() error {
-	tmp := []string{"templates/index.html", "templates/header.html", "templates/footer.html"}
-	tmp1 := []string{"templates/contact.html", "templates/header.html", "templates/footer.html"}
-	start := server.Server{}
-	start.Prefix("/content/", "/static/")
-	start.RequestTemplate("contact", "/contact/", tmp1)
-	start.RequestTemplate("index", "/", tmp)
 
-	if err := http.ListenAndServe(":8080", nil); err != nil {
+	start := server.Server{}
+
+	// візміть за увагу що шлях до стилів то що повний шлях в писаний в лінці як: /static/css/main.css
+	start.Prefix("/static/")
+
+	//метод RequestTemplate примаэ 3 параметра попарятку це назва темплйету, роутінг для запита сторінки, прямий шлях до hmtl шаблонів які ви використовуєте в темлейті
+	start.RequestTemplate("index", "/", "templates/index.html", "templates/header.html", "templates/footer.html")
+	start.RequestTemplate("contact", "/contact/", "templates/contact.html", "templates/header.html", "templates/footer.html")
+
+	if err := http.ListenAndServe(":8088", nil); err != nil {
 		return err
 	}
 
