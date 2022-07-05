@@ -38,7 +38,7 @@ func (s *Server) RequestTemplate(maineroot string, handlename string, tmp []stri
 
 }
 func (s *Server) index(w http.ResponseWriter, r *http.Request) {
-	
+
 	t, err := template.ParseFiles(s.tmp[0])
 	for i := 1; i < len(s.tmp); i++ {
 		t.ParseFiles(s.tmp[i])
