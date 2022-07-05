@@ -42,10 +42,12 @@ func (s *Server) index(w http.ResponseWriter, r *http.Request) {
 	t, err := template.ParseFiles(s.tmp[0])
 	for i := 1; i < len(s.tmp); i++ {
 		t.ParseFiles(s.tmp[i])
+
+		if err != nil {
+			log.Println("Error executing template :", err)
+			return
+		}
 	}
-	if err != nil {
-		log.Println("Error executing template :", err)
-		return
-	}
+
 	t.ExecuteTemplate(w, s.maineroot, nil)
 }
