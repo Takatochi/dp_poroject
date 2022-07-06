@@ -1,7 +1,6 @@
 package server
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"text/template"
@@ -21,7 +20,7 @@ func Init() *Server {
 
 func (s *Server) Prefix(_handle ...string) {
 	s._handle = _handle
-	
+
 	for i := 0; i < len(s._handle); i++ {
 		s.prehandle(s._handle[i])
 	}
@@ -41,7 +40,6 @@ func (s *Server) RequestTemplate(maineroot string, handlename string, tmp ...str
 }
 func (s Server) index(w http.ResponseWriter, r *http.Request) {
 
-	fmt.Println(s.tmp)
 	t, err := template.ParseFiles(s.tmp...)
 	if err != nil {
 		log.Println("Error executing template :", err)
