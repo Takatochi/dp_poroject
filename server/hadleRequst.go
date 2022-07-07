@@ -1,6 +1,7 @@
 package server
 
 import (
+	
 	"log"
 	"net/http"
 	"text/template"
@@ -11,6 +12,7 @@ type Server struct {
 	handlename string
 	maineroot  string
 	tmp        []string
+	post     interface{}
 }
 
 func Init() *Server {
@@ -30,7 +32,9 @@ func (s *Server) prehandle(handle string) {
 	http.Handle(handle, http.StripPrefix(handle, http.FileServer(http.Dir("."+handle))))
 }
 
-func (s *Server) RequestTemplate(maineroot string, handlename string, tmp ...string) {
+func (s *Server) RequestTemplate(post interface{}, maineroot string, handlename string, tmp ...string) {
+	
+	s.post=post
 	s.handlename = handlename
 	s.maineroot = maineroot
 	s.tmp = tmp
@@ -45,6 +49,6 @@ func (s Server) index(w http.ResponseWriter, r *http.Request) {
 		log.Println("Error executing template :", err)
 		return
 	}
-	t.ExecuteTemplate(w, s.maineroot, nil)
+	t.ExecuteTemplate(w, s.maineroot, s.post)
 
 }
