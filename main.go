@@ -17,7 +17,7 @@ func main() {
 }
 func run() error {
 
-	start := server.Server{}
+	start := &server.Server{}
 	post := view.Post{
 		Age:   15,
 		Name:  "Arthur",
@@ -30,7 +30,7 @@ func run() error {
 	start.RequestTemplate(post, "index", "/", "templates/index.html", "templates/header.html", "templates/footer.html")
 	start.RequestTemplate(nil, "contact", "/contact/", "templates/contact.html", "templates/header_contact.html", "templates/footer.html")
 
-	if err := http.ListenAndServe(":8088", nil); err != nil {
+	if err := http.ListenAndServe(":8088", &start.MUX); err != nil {
 		return err
 	}
 
