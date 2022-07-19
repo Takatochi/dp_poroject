@@ -69,7 +69,7 @@ func add() error {
 		return err
 	}
 
-	req.Header.Add("X-Token", "uz-gWor_utU_sajBMtbsloKL2DmlxkOElo6eKKy_LhgA")
+	req.Header.Add("X-Token", "")
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return err
