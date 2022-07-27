@@ -1,69 +1,43 @@
 package handler
 
 import (
-	"log"
 	"net/http"
-	"text/template"
+
+	"github.com/gin-gonic/gin"
 )
 
 type Handler struct {
-	_handle    []string
 	handlename string
 	maineroot  string
-	tmp        []string
 	post       any
-	MUX        http.ServeMux
+	router     *gin.Engine
 }
 
-func InitHandler() *Handler {
+func InitHandler(router *gin.Engine) *Handler {
 	return &Handler{
-		MUX: *http.NewServeMux(),
+		router: router,
 	}
 
 }
 
-func (s *Handler) Prefix(_handle ...string) {
-	s._handle = _handle
+func (s *Handler) RequestTemplate(post any, maineroot string, handlename string) {
 
-	for i := 0; i < len(s._handle); i++ {
-		s.prehandle(s._handle[i])
-	}
-}
-
-func (s *Handler) prehandle(handle string) {
-	s.MUX.Handle(handle, http.StripPrefix(handle, http.FileServer(http.Dir("."+handle))))
-}
-
-func (s *Handler) RequestTemplate(post any, maineroot string, handlename string, tmp ...string) {
-
-	s.post = &post
+	s.post = post
 	s.handlename = handlename
 	s.maineroot = maineroot
-	s.tmp = tmp
-	s.MUX.HandleFunc(s.handlename, s.index)
+
+	s.router.GET(s.handlename, s.ServeHTTP)
 
 }
 
-func (s Handler) index(w http.ResponseWriter, r *http.Request) {
-	// id := r.FormValue("id")
-	s.GET(w, r)
-	t, err := template.ParseFiles(s.tmp...)
-	if err != nil {
-		log.Println("Error executing template :", err)
-		return
-	}
-	t.ExecuteTemplate(w, s.maineroot, s.post)
+func (s *Handler) ServeHTTP(ctx *gin.Context) {
 
-}
-func (s *Handler) GET(w http.ResponseWriter, r *http.Request) {
+	ctx.Request.ParseForm()
+	get := ctx.Request.Form
 
-	if r.Method == "GET" {
-		r.ParseForm()
-		// они все тут
-		params := r.Form
-		// s.post.Get = params
-		log.Println(params)
-		// fmt.Fprintln(w, params["id"])
-	}
+	ctx.HTML(http.StatusOK, s.maineroot, gin.H{
+		"Post": s.post,
+		"Rget": get["id"][0],
+	})
 
 }

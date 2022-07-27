@@ -1,6 +1,6 @@
 package view
 
-type Post struct {
+type Index struct {
 	Age         int16
 	Name, Sname string
 	Get         any
