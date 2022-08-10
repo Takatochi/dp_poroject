@@ -3,44 +3,53 @@ package main
 
 import (
 	"encoding/json"
+	"html/template"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"project/handler"
 	"project/server"
-	"project/view"
 
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
 	router := gin.New()
-	srv := new(server.Server)
-	post := view.Index{}
-	result := []map[string]any{}
+	g := handler.InitHandler(router)
 
-	err := add(&result)
-	if err != nil {
-		log.Fatal(err)
-	}
-	log.Println(result)
-	index := handler.InitHandler(router)
-	// index.Prefix("/static/")
-	router.Static("/static", "./static/")
-	router.LoadHTMLGlob("templates/*.html")
-	index.RequestTemplate(result, "index", "/")
-	contact := handler.InitHandler(router)
-	contact.RequestTemplate(post, "contact", "/contact/")
+	srv := new(server.Server)
+	Run(*g, router)
 
 	if err := srv.Run("8088", router); err != nil {
 		log.Fatal(err)
 	}
 
 }
+func Run(hadler handler.Handler, router *gin.Engine) {
+
+	router.Static("/static", "./static/")
+
+	router.SetFuncMap(template.FuncMap{
+		"whole": hadler.Index.Whole,
+	})
+
+	router.LoadHTMLGlob("templates/*.html")
+	result := []map[string]any{}
+
+	err := add(&result)
+	if err != nil {
+		log.Fatal(err)
+	}
+	r(&hadler.Index, result, router)
+	hadler.Contact.Routing(result, "contact", "/contact/", router)
+}
+func r(g handler.Routined, result any, router *gin.Engine) {
+	g.Routing(result, "index", "/", router)
+}
 func add(result *[]map[string]any) error {
 
 	// params := url.Values{}
-	// params.Add("X-Token", ``)
+	// params.Add("X-Token", `uz-gWor_utU_sajBMtbsloKL2DmlxkOElo6eKKy_LhgA`)
 	// body := strings.NewReader(params.Encode())
 
 	// req, err := http.NewRequest("GET", "https://api.monobank.ua/personal/statement/{0}/{1546304461}/{to}", body)
@@ -63,7 +72,7 @@ func add(result *[]map[string]any) error {
 		return err
 	}
 
-	req.Header.Add("X-Token", "")
+	req.Header.Add("X-Token", "uz-gWor_utU_sajBMtbsloKL2DmlxkOElo6eKKy_LhgA")
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
