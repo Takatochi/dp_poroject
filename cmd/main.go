@@ -1,47 +1,76 @@
-// Шаблон для роботи с go та http запросами( веб сайти і тд)
 package main
 
 import (
 	"encoding/json"
+	"flag"
 	"html/template"
 	"io/ioutil"
 	"log"
 	"net/http"
-	"project/handler"
-	"project/server"
+	"project/pkg/handler"
+	"project/pkg/server"
+	"project/pkg/store"
 
+	"github.com/BurntSushi/toml"
 	"github.com/gin-gonic/gin"
 )
 
+var (
+	configPath string
+)
+
+func init() {
+	flag.StringVar(&configPath, "config-path", "configs/server.toml", "path to config file")
+}
+
 func main() {
+	flag.Parse()
+
 	router := gin.New()
 	g := handler.InitHandler(router)
 
 	srv := new(server.Server)
-	Run(*g, router)
 
-	if err := srv.Run("8088", router); err != nil {
+	config := server.NewConfig()
+	_, err := toml.DecodeFile(configPath, config)
+	if err != nil {
+		log.Fatal(err)
+	}
+	st := store.New(config)
+
+	if err := st.Open(); err != nil {
+		log.Fatal(err)
+	}
+	if err := Run(g, router); err != nil {
+		log.Fatal(err)
+	}
+
+	if err := srv.Run(config, router); err != nil {
 		log.Fatal(err)
 	}
 
 }
-func Run(hadler handler.Handler, router *gin.Engine) {
+func Run(hadler *handler.Handler, router *gin.Engine) error {
 
 	router.Static("/static", "./static/")
 
 	router.SetFuncMap(template.FuncMap{
-		"whole": hadler.Index.Whole,
+		"whole": handler.Whole,
 	})
 
 	router.LoadHTMLGlob("templates/*.html")
+
 	result := []map[string]any{}
 
 	err := add(&result)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
+
 	r(&hadler.Index, result, router)
 	hadler.Contact.Routing(result, "contact", "/contact/", router)
+
+	return nil
 }
 func r(g handler.Routined, result any, router *gin.Engine) {
 	g.Routing(result, "index", "/", router)
@@ -52,7 +81,7 @@ func add(result *[]map[string]any) error {
 	// params.Add("X-Token", `uz-gWor_utU_sajBMtbsloKL2DmlxkOElo6eKKy_LhgA`)
 	// body := strings.NewReader(params.Encode())
 
-	// req, err := http.NewRequest("GET", "https://api.monobank.ua/personal/statement/{0}/{1546304461}/{to}", body)
+	// req, err := http.NewRequest("GET", "", body)
 	// if err != nil {
 	// 	// handle err
 	// }
@@ -67,7 +96,7 @@ func add(result *[]map[string]any) error {
 
 	// log.Println(&resp.Body)
 
-	req, err := http.NewRequest("GET", "https://api.monobank.ua/personal/statement/huGbpnagwBu09tUnio8zXA/1658086424", nil)
+	req, err := http.NewRequest("GET", "", nil)
 	if err != nil {
 		return err
 	}

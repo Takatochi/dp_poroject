@@ -2,6 +2,7 @@ package handler
 
 import (
 	"net/http"
+	"project/pkg/store"
 
 	"github.com/gin-gonic/gin"
 )
@@ -13,10 +14,10 @@ type Handler struct {
 	Index   index
 	Contact contact
 	router  *gin.Engine
+	Store   *store.Store
 }
 type path struct {
-	maineroot  string
-	handlename string
+	maineroot string
 }
 type index struct {
 	post any
@@ -37,11 +38,10 @@ func InitHandler(router *gin.Engine) *Handler {
 func (s *index) Routing(post any, maineroot string, handlename string, router *gin.Engine) {
 	s.post = post
 	s.maineroot = maineroot
-	s.handlename = handlename
-	router.GET(s.handlename, s.ServeHTTP)
+	router.GET(handlename, s.serveHTTP)
 }
 
-func (s index) ServeHTTP(ctx *gin.Context) {
+func (s index) serveHTTP(ctx *gin.Context) {
 
 	ctx.Request.ParseForm()
 	get := ctx.Request.Form
@@ -51,22 +51,15 @@ func (s index) ServeHTTP(ctx *gin.Context) {
 	})
 
 }
-func (s *index) Whole(a int, b int) bool {
-	if a%b == 0 {
-		return true
-	} else if a%b == 1 {
-		return false
-	}
-	return true
-}
+
 func (s *contact) Routing(post any, maineroot string, handlename string, router *gin.Engine) {
 	s.post = post
 	s.maineroot = maineroot
-	s.handlename = handlename
-	router.GET(s.handlename, s.ServeHTTP)
+
+	router.GET(handlename, s.serveHTTP)
 }
 
-func (s contact) ServeHTTP(ctx *gin.Context) {
+func (s contact) serveHTTP(ctx *gin.Context) {
 
 	ctx.Request.ParseForm()
 	get := ctx.Request.Form
