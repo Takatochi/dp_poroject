@@ -8,3 +8,6 @@ func Whole(a int, b int) bool {
 	}
 	return true
 }
+func Decimal(a float64) float64 {
+	return a / 100
+}
