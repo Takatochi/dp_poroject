@@ -14,8 +14,8 @@ type UserRepository struct {
 func (r UserRepository) Create(u *model.User) error {
 
 	return r.store.db.QueryRow(
-		"INSERT INTO `user` (Email, Name) VALUES (?, ?)",
-		u.Email, u.EncryptedPassword).Scan(&u.ID)
+		"INSERT INTO `user` (Email, Password) VALUES (?, ?)",
+		u.Email, u.Password).Err()
 }
 func (r *UserRepository) Find(id int) (*model.User, error) {
 	u := &model.User{}

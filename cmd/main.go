@@ -17,23 +17,17 @@ func init() {
 }
 
 func main() {
-	//server
+	//server ...
 	srv := new(server.Server)
 
 	flag.Parse()
 
-	// g := handler.NewHandler()
-	// routers := g.Routing()
-
 	config := server.NewConfig()
 	_, err := toml.DecodeFile(configPath, config)
+
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	// if err := Run(g, routers); err != nil {
-	// 	log.Fatal(err)
-	// }
 
 	if err := srv.Run(config); err != nil {
 		log.Fatal(err)
