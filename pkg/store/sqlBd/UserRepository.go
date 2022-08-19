@@ -2,11 +2,11 @@ package sqlBd
 
 import (
 	"database/sql"
-	"project/pkg/model"
+	"project/app/model"
 	"project/pkg/store"
 )
 
-// Repository ...
+// UserRepository ...
 type UserRepository struct {
 	store *Store
 }

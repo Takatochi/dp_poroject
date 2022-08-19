@@ -1,7 +1,7 @@
 package teststore
 
 import (
-	"project/pkg/model"
+	"project/app/model"
 	"project/pkg/store"
 )
 

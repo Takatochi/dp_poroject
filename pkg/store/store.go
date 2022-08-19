@@ -1,6 +1,8 @@
 package store
 
-import "project/pkg/model"
+import (
+	"project/app/model"
+)
 
 // UserRepository ...
 type UserRepository interface {
@@ -8,7 +10,13 @@ type UserRepository interface {
 	Find(int) (*model.User, error)
 }
 
+// TokenRepository ...
+type TokenRepository interface {
+	Find(int) (*model.Token, error)
+}
+
 // Store ...
 type Store interface {
 	User() UserRepository
+	Token() TokenRepository
 }

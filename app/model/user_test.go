@@ -1,7 +1,7 @@
 package model_test
 
 import (
-	"project/pkg/model"
+	model2 "project/app/model"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -10,20 +10,20 @@ import (
 func TestUser_Validate(t *testing.T) {
 	testCases := []struct {
 		name    string
-		u       func() *model.User
+		u       func() *model2.User
 		isValid bool
 	}{
 		{
 			name: "valid",
-			u: func() *model.User {
-				return model.TestUser(t)
+			u: func() *model2.User {
+				return model2.TestUser(t)
 			},
 			isValid: true,
 		},
 		{
 			name: "with encrypted password",
-			u: func() *model.User {
-				u := model.TestUser(t)
+			u: func() *model2.User {
+				u := model2.TestUser(t)
 				u.Password = ""
 				u.EncryptedPassword = "encryptedpassword"
 
@@ -33,8 +33,8 @@ func TestUser_Validate(t *testing.T) {
 		},
 		{
 			name: "empty email",
-			u: func() *model.User {
-				u := model.TestUser(t)
+			u: func() *model2.User {
+				u := model2.TestUser(t)
 				u.Email = ""
 
 				return u
@@ -43,8 +43,8 @@ func TestUser_Validate(t *testing.T) {
 		},
 		{
 			name: "invalid email",
-			u: func() *model.User {
-				u := model.TestUser(t)
+			u: func() *model2.User {
+				u := model2.TestUser(t)
 				u.Email = "invalid"
 
 				return u
@@ -53,8 +53,8 @@ func TestUser_Validate(t *testing.T) {
 		},
 		{
 			name: "empty password",
-			u: func() *model.User {
-				u := model.TestUser(t)
+			u: func() *model2.User {
+				u := model2.TestUser(t)
 				u.Password = ""
 
 				return u
@@ -63,8 +63,8 @@ func TestUser_Validate(t *testing.T) {
 		},
 		{
 			name: "short password",
-			u: func() *model.User {
-				u := model.TestUser(t)
+			u: func() *model2.User {
+				u := model2.TestUser(t)
 				u.Password = "short"
 
 				return u
@@ -85,7 +85,7 @@ func TestUser_Validate(t *testing.T) {
 }
 
 func TestUser_BeforeCreate(t *testing.T) {
-	u := model.TestUser(t)
+	u := model2.TestUser(t)
 	assert.NoError(t, u.BeforeCreate())
 	assert.NotEmpty(t, u.EncryptedPassword)
 }

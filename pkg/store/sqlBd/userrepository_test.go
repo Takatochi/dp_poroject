@@ -1,7 +1,7 @@
 package sqlBd_test
 
 import (
-	"project/pkg/model"
+	"project/app/model"
 	"project/pkg/store/sqlBd"
 	"testing"
 

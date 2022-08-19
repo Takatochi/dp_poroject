@@ -2,8 +2,9 @@ package handler
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"net/http"
+	"project/pkg/logger"
 	"project/pkg/store"
 
 	"github.com/gin-gonic/gin"
@@ -12,17 +13,17 @@ import (
 type Handler struct {
 	router *gin.Engine
 	store  store.Store
-	Index
 }
 type Index struct {
+	Handler *Handler
 }
 
 func NewHandler(store store.Store) *Handler {
-	hadler := &Handler{
+	return &Handler{
 		router: gin.New(),
 		store:  store,
 	}
-	return hadler
+
 }
 func (h *Handler) Routing() *gin.Engine {
 
@@ -33,18 +34,24 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	h.router.ServeHTTP(w, r)
 }
 
-func (h *Index) ServeHTTP(ctx *gin.Context) {
+func (h *Index) Index(ctx *gin.Context) {
 
 	ctx.Request.ParseForm()
 	result := []map[string]any{}
-	add(&result)
 
+	if err := add(&result); err != nil {
+		logger.Debug(err)
+	}
 	get := ctx.Request.Form
 	ctx.HTML(http.StatusOK, "index", gin.H{
 		"Post": result,
 		"Rget": get,
 	})
 
+}
+func (h *Index) Api(ctx *gin.Context) {
+	store, _ := h.Handler.store.Token().Find(1)
+	ctx.JSON(http.StatusOK, store)
 }
 func add(result *[]map[string]any) error {
 
@@ -69,7 +76,7 @@ func add(result *[]map[string]any) error {
 
 	// log.Println(&resp.Body)
 
-	req, err := http.NewRequest("GET", "https://api.monobank.ua/personal/statement/huGbpnagwBu09tUnio8zXA/1658086424", nil)
+	req, err := http.NewRequest("GET", "https://api.monobank.ua/personal/statement/huGbpnagwBu09tUnio8zXA/1659349687", nil)
 	if err != nil {
 		return err
 	}
@@ -80,7 +87,7 @@ func add(result *[]map[string]any) error {
 	if err != nil {
 		return err
 	}
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return err
 	}
