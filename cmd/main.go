@@ -5,11 +5,13 @@ import (
 	"github.com/BurntSushi/toml"
 	"project/app"
 	srv "project/app/server"
+	"project/pkg/Database"
 	"project/pkg/logger"
 )
 
 var (
-	configPath string
+	configPath  string
+	configPathS string
 )
 
 func init() {
@@ -28,6 +30,7 @@ func main() {
 		return
 	}
 	// Run App ...
-	app.Run(config)
+	var bd = new(Database.MySQLDatabase)
+	app.Run(config, bd)
 
 }

@@ -1,4 +1,4 @@
 
 bind_addr= "8088"
-database_url = "root:@tcp(127.0.0.1:3306)/golang"
+database_url = "root:root@tcp(127.0.0.1:3309)/ww3y-34"
 driverName = "mysql"

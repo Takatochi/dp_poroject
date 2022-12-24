@@ -2,12 +2,15 @@ package app
 
 import (
 	"context"
-	"database/sql"
 	"errors"
+	"fmt"
 	"net/http"
 	"os"
+	"os/exec"
 	"os/signal"
+	"project/app/SqlServer"
 	"project/app/server"
+	"project/pkg/Database"
 	"project/pkg/handler"
 	"project/pkg/logger"
 	"project/pkg/store/sqlBd"
@@ -15,25 +18,56 @@ import (
 	"time"
 )
 
-func Run(config *server.Config) {
+// ```
+const (
+	dbName    = "mydb"
+	tableName = "mytable"
+)
+
+func Run(config *server.Config, db Database.Database) {
+	go func() {
+		//mysql --host=127.0.0.1 --port=3309 -u root  mydb -e "source J:\dump\log\wds_99yy36-242972424.sql"
+		//mysql --host=127.0.0.1 --port=3309 -u root  ww3y-34 -e "Select * From server"
+
+		err := SqlServer.Start()
+		if err != nil {
+			logger.Error(err)
+		}
+
+	}()
+	// Виконуємо команду завантаження дампу у MySQL
+	//cmd := exec.Command("mysql", "-u", "root", "-proot", "ww3y-34", "<", "app/SqlServer/Serverdata/wds_44yy50-252982525.sql")
+	cmd := exec.Command("mysql", "--host=127.0.0.1", "--port=3309", "--password=root", "-u", "root", "ww3y-34", "-e", "source app\\SqlServer\\Serverdata\\wds_44yy50-252982525.sql")
+	fmt.Println(cmd)
+	// Записуємо результат виконання команди у буфер
+	//var out bytes.Buffer
+	//cmd.Stdout = &out
+	err := cmd.Run()
+
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	t := time.Now()
+
 	srv := new(server.Server)
-	db, err := newDB(config)
+
+	database, err := db.Open(config)
 	if err != nil {
 		logger.Error(err)
 
 		return
 	}
-	defer db.Close()
-	t := time.Now()
+	defer database.Close()
 
 	// init bd
-	storet := make(chan *sqlBd.Store, 1)
+	store := make(chan *sqlBd.Store, 1)
 	go func() {
-		storet <- sqlBd.New(db)
+		store <- sqlBd.New(database)
 	}()
 
 	// init handler
-	had := handler.NewHandler(<-storet)
+	had := handler.NewHandler(<-store)
 
 	go func() {
 		if err := srv.Run(config, had); !errors.Is(err, http.ErrServerClosed) {
@@ -55,22 +89,8 @@ func Run(config *server.Config) {
 	defer shutdown()
 
 	if err := srv.Stop(ctx); err != nil {
+
 		logger.Errorf("failed to stop server: %v", err)
 	}
 
-}
-func newDB(c *server.Config) (*sql.DB, error) {
-	db, err := sql.Open(c.DriverName, c.DatabaseURL)
-	if err != nil {
-		return nil, err
-	}
-
-	if err := db.Ping(); err != nil {
-		return nil, err
-	}
-
-	db.SetConnMaxLifetime(time.Minute * 10)
-	db.SetMaxOpenConns(50)
-	db.SetMaxIdleConns(20)
-	return db, nil
 }

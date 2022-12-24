@@ -10,13 +10,14 @@ type UserRepository interface {
 	Find(int) (*model.User, error)
 }
 
-// TokenRepository ...
-type TokenRepository interface {
-	Find(int) (*model.Token, error)
+// ListRepository ...
+type ListRepository interface {
+	Find() (*[]model.Server, error)
+	AddServer(u *model.Server) error
 }
 
 // Store ...
 type Store interface {
 	User() UserRepository
-	Token() TokenRepository
+	Server() ListRepository
 }

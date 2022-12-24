@@ -1,0 +1,27 @@
+
+{{ define "listServer" }}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+  <h1 class="h2">Панель приладів</h1>
+  <div class="btn-toolbar mb-2 mb-md-0">
+    <div class="btn-group me-2">
+      <button type="button" id="create_btn" class="btn btn-sm btn-outline-secondary btn-panel-top"
+              style=" --bs-btn-color: black;
+                --bs-btn-border-color: black;">Create</button>
+      <button type="button" id="delete_btn" class="btn-panel-top btn btn-sm btn-outline-secondary "
+              style=" --bs-btn-color: black;
+                --bs-btn-border-color: black;">Delete</button>
+    </div>
+  </div>
+</div>
+
+<div id="list-group" class="list-group">
+  <button type="button" class="list-group-item list-group-item-action " aria-current="true">
+    The current button
+  </button>
+  <button type="button" class="list-group-item list-group-item-action" >A second item</button>
+  <button type="button" class="list-group-item list-group-item-action" >A second item</button>
+  <button type="button" class="list-group-item list-group-item-action">A third button item</button>
+  <button type="button" class="list-group-item list-group-item-action">A fourth button item</button>
+  <button type="button" class="list-group-item list-group-item-action" disabled>A disabled button item</button>
+</div>
+{{end}}
