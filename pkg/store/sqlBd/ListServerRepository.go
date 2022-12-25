@@ -2,6 +2,7 @@ package sqlBd
 
 import (
 	"database/sql"
+	"fmt"
 	"project/app/model"
 	"project/pkg/store"
 )
@@ -53,5 +54,16 @@ func (r *ListRepository) AddServer(u *model.Server) error {
 		return err
 	}
 
+	return nil
+}
+func (r *ListRepository) DeleteServerFromDB(id int) error {
+	// Создаем строку запроса
+	query := fmt.Sprintf("DELETE FROM Server WHERE id=%d", id)
+
+	// Выполняем запрос
+	_, err := r.store.db.Exec(query)
+	if err != nil {
+		return err
+	}
 	return nil
 }

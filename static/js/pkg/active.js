@@ -1,5 +1,5 @@
 import {addList, SettingPupAdd} from "./ListUpdate.js";
-import {initServer, listServer} from "../datainterface/list.js";
+import {initServer, listServer,deleteServer} from "../datainterface/list.js";
 
 const RouterHrefbtnactive =(ElementById,querySelectorAll)=>{
     const listGroup = document.getElementById('barmenu'),
@@ -14,9 +14,10 @@ const RouterHrefbtnactive =(ElementById,querySelectorAll)=>{
     })
 }
 
-const ListBtnactive = (getElementById ,querySelectorAll,funcElementById)=>{
-    const listGroup = document.getElementById(getElementById)
-    const itemGroup = listGroup.querySelectorAll(querySelectorAll)
+const ListBtnactive = (getElementById ,querySelectorAll)=>{
+    const listGroup = document.getElementById(getElementById),
+     itemGroup = listGroup.querySelectorAll(querySelectorAll)
+
     if (!itemGroup) {return}
         itemGroup.forEach(
             element => {
@@ -30,13 +31,13 @@ const ListBtnactive = (getElementById ,querySelectorAll,funcElementById)=>{
                         )
                         this.classList.add('active')
                         this.setAttribute("active", true);
-                        Deletebtn(this, funcElementById)
 
                     }
                 )
 
             }
-        );
+        )
+
 
 }
 const Activebtn = (ElementById ,querySelectorAll)=>{
@@ -58,15 +59,46 @@ const Activebtn = (ElementById ,querySelectorAll)=>{
     );
     return itemGroup;
 }
-const Deletebtn=(elemtn,ElementById)=>{
-    const status=elemtn.getAttribute("active")
-    if (status){
-        const element = document.getElementById(ElementById)
-        element.addEventListener('click', ()=>{
-            elemtn.remove()
-            elemtn=null
+const Deletebtn=(getElementById,ElementById)=>{
+    const listGroup = document.getElementById(getElementById),
+        delete_btn = document.getElementById(ElementById)
+
+    delete_btn.addEventListener('click', ()=>{
+
+        
+        const elementToDelete = listGroup.querySelector('[active="true"]');
+        // Перевірити чи існує такий елемент
+        if (!elementToDelete) {return}
+
+        const key=elementToDelete.getAttribute("key")
+
+            // Видалити елемент з документу
+        elementToDelete.parentNode.removeChild(elementToDelete);
+
+        const id = listServer[key].id
+        deleteServer(id).then(_ => {
+            listServer.splice(key, 1);
+            changeKey(listGroup)
         })
-    }
+            .catch(error => {
+                console.log(error);
+            });
+
+    })
+
+
+
+
+
+
+
+}
+const changeKey=(listGroup)=>{
+
+   const item=listGroup.querySelectorAll("button")
+    item.forEach((e,index)=>{
+        e.setAttribute('key',index-1 );
+    })
 
 }
 const Createbtn=(ElementById,funcElementById)=>{
@@ -81,21 +113,21 @@ const Createbtn=(ElementById,funcElementById)=>{
     saveModal.addEventListener('click',()=>{
         $('#CreatePopModalCenter').modal('hide')
         const input= document.getElementById('inputServer')
-        Server.id=0
-        Server.name=input.value
-        Server.port=2323
+
 
         initServer(input.value)
             .then(data=>{
-                console.log(data)
+                Server.id=data.data.id
+                Server.port=data.data.port
+                Server.name=input.value
+                listServer.push(Server)
+                addList(Server, listServer.length-1)
         })
             .catch(error=>{
             console.log(error)
         })
 
-        listServer.push(Server)
-        console.log(listServer[listServer.length - 1])
-        addList(Server, listServer.length-1)
+
 
     })
 }
@@ -121,4 +153,13 @@ const ServerBtn=(hash)=>{
 
     })
 }
-export {Activebtn,ListBtnactive,Createbtn,RouterHrefbtnactive,SettingHubModal,ServerBtn};
+function isFormFilled(form) {
+    const inputs = form.querySelectorAll('input');
+    for (let i = 0; i < inputs.length; i++) {
+        if (!inputs[i].value) {
+            return false;
+        }
+    }
+    return true;
+}
+export {Activebtn,ListBtnactive,Createbtn,RouterHrefbtnactive,SettingHubModal,ServerBtn,Deletebtn};

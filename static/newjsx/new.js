@@ -1,5 +1,5 @@
 import _,{map} from "../js/pkg/underscore-esm.js";
-import {Createbtn, ListBtnactive,SettingHubModal,ServerBtn} from "/static/js/pkg/active.js"
+import {Createbtn, ListBtnactive, SettingHubModal, ServerBtn, Deletebtn} from "/static/js/pkg/active.js"
 import {listServer,getNewServer} from "../js/datainterface/list.js";
 import {addList} from "../js/pkg/ListUpdate.js";
 (()=>{
@@ -22,7 +22,8 @@ function LoadNews(){
 
                 Createbtn("list-group", "create_btn")
                 ServerBtn("#Server")
-                ListBtnactive('list-group', "button", "delete_btn")
+                ListBtnactive('list-group', "button")
+                Deletebtn('list-group', "delete_btn")
                 app.addEventListener('click',()=>{
                    SettingHubModal('list-group',listServer)
 

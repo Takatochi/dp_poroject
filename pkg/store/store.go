@@ -14,6 +14,7 @@ type UserRepository interface {
 type ListRepository interface {
 	Find() (*[]model.Server, error)
 	AddServer(u *model.Server) error
+	DeleteServerFromDB(id int) error
 }
 
 // Store ...

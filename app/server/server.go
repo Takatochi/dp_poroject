@@ -74,6 +74,7 @@ func configureRouter(h *handler.Handler, i *handler.Index) {
 	server := router.Group("/Server")
 	{
 		server.POST("/init", i.Initiation)
+		server.DELETE("/delete/server/:id", i.DeleteSever)
 	}
 
 }

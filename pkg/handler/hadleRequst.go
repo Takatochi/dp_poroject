@@ -8,6 +8,7 @@ import (
 	"project/pkg/logger"
 	"project/pkg/port"
 	"project/pkg/store"
+	"strconv"
 )
 
 type Handler struct {
@@ -77,6 +78,24 @@ func (h *Index) Initiation(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, "Server not found")
 		return
 	}
-	fmt.Println(message)
 	ctx.JSON(http.StatusOK, srv)
+}
+
+// DeleteSever curl  -X DELETE http://localhost:8088/Serve/delete/server/:id
+func (h *Index) DeleteSever(ctx *gin.Context) {
+	userId := ctx.Param("id")
+	fmt.Println(userId)
+	num, err := strconv.Atoi(userId)
+	if err != nil {
+		ctx.JSON(http.StatusConflict, gin.H{"error": err})
+		logger.Error(err)
+		return
+	}
+	err = h.Handler.store.Server().DeleteServerFromDB(int(num))
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err})
+		return
+	}
+
+	ctx.Status(http.StatusOK)
 }
