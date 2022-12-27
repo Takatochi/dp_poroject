@@ -15,6 +15,7 @@ const RouterHrefbtnactive =(ElementById,querySelectorAll)=>{
 }
 
 const ListBtnactive = (getElementById ,querySelectorAll)=>{
+
     const listGroup = document.getElementById(getElementById),
      itemGroup = listGroup.querySelectorAll(querySelectorAll)
 
@@ -76,8 +77,9 @@ const Deletebtn=(getElementById,ElementById)=>{
         elementToDelete.parentNode.removeChild(elementToDelete);
 
         const id = listServer[key].id
+        console.log(id)
         deleteServer(id).then(_ => {
-            listServer.splice(key, 1);
+            listServer.filter((server) => server.id !== key);
             changeKey(listGroup)
         })
             .catch(error => {
@@ -85,12 +87,6 @@ const Deletebtn=(getElementById,ElementById)=>{
             });
 
     })
-
-
-
-
-
-
 
 }
 const changeKey=(listGroup)=>{
@@ -101,35 +97,36 @@ const changeKey=(listGroup)=>{
     })
 
 }
-const Createbtn=(ElementById,funcElementById)=>{
-    let Server = new Object();
-    const listGroup = document.getElementById(ElementById)
+const CreateServer=(ElementById,funcElementById)=>{
     const el=document.getElementById(funcElementById)
+
     el.addEventListener('click',()=>{
         $('#CreatePopModalCenter').modal('show')
 
     })
     const saveModal=document.getElementById("modal-btn-save")
-    saveModal.addEventListener('click',()=>{
-        $('#CreatePopModalCenter').modal('hide')
-        const input= document.getElementById('inputServer')
+    saveModal.addEventListener('click',createButton)
 
-
+    function createButton() {
+        $('#CreatePopModalCenter').modal('hide');
+        const input = document.getElementById('inputServer');
         initServer(input.value)
-            .then(data=>{
-                Server.id=data.data.id
-                Server.port=data.data.port
-                Server.name=input.value
-                listServer.push(Server)
-                addList(Server, listServer.length-1)
-        })
-            .catch(error=>{
-            console.log(error)
-        })
+            .then((data) => {
+                const Server = {
+                    id: data.data.id,
+                    name: input.value,
+                    port: data.data.port,
 
+                };
+                listServer.push(Server);
+                addList(Server, listServer.length - 1);
+                ListBtnactive(ElementById, 'button');
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+    }
 
-
-    })
 }
 const SettingHubModal=(ElementById,obj)=>{
 
@@ -162,4 +159,4 @@ function isFormFilled(form) {
     }
     return true;
 }
-export {Activebtn,ListBtnactive,Createbtn,RouterHrefbtnactive,SettingHubModal,ServerBtn,Deletebtn};
+export {Activebtn,ListBtnactive,CreateServer,RouterHrefbtnactive,SettingHubModal,ServerBtn,Deletebtn};

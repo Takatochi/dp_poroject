@@ -1,5 +1,5 @@
 import _,{map} from "../js/pkg/underscore-esm.js";
-import {Createbtn, ListBtnactive, SettingHubModal, ServerBtn, Deletebtn} from "/static/js/pkg/active.js"
+import {CreateServer, ListBtnactive, SettingHubModal, ServerBtn, Deletebtn} from "/static/js/pkg/active.js"
 import {listServer,getNewServer} from "../js/datainterface/list.js";
 import {addList} from "../js/pkg/ListUpdate.js";
 (()=>{
@@ -9,29 +9,27 @@ import {addList} from "../js/pkg/ListUpdate.js";
 })()
 
 function LoadNews(){
+
     const app=document.getElementById("app")
 
     app.addEventListener('appDom',(e)=>{
-        e.detail.observe.forEach(ob=>{
 
-            if(ob.addedNodes[0].tagName!=="SCRIPT"&&window.location.hash.substr(1)==="New") {
+            if(window.location.hash.substr(1)==="New") {
 
                 listServer.forEach((obj, index) => {
                     addList(obj, index)
                 })
-
-                Createbtn("list-group", "create_btn")
-                ServerBtn("#Server")
                 ListBtnactive('list-group', "button")
+                CreateServer("list-group", "create_btn")
+                ServerBtn("#Server")
                 Deletebtn('list-group', "delete_btn")
                 app.addEventListener('click',()=>{
                    SettingHubModal('list-group',listServer)
-
                 })
 
             }
 
-        })
+
     })
 }
 

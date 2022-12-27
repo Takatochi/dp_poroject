@@ -27,7 +27,7 @@ const initServer= async (name) => {
 
 }
 const deleteServer= async (id) => {
-   return  axios.delete(`/Server/delete/server/${id}`)
+   return  await  axios.delete(`/Server/delete/server/${id}`)
 
 }
 export {listServer,getNewServer,initServer,deleteServer}
