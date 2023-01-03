@@ -97,7 +97,9 @@
     </ul>
 
 </div>
-
+    <div class="loader">
+        <div class="loader_inner"></div>
+    </div>
     <div id="app" class="container_menu ">
 
     </div>
@@ -117,9 +119,9 @@
                     <!--                    </button>-->
                 </div>
                 <div class="modal-body">
-                    <form class="modal-form">
+                    <form id="addSever" class="modal-form">
                         <label>Server Name</label>
-                        <input type="text" id="inputServer">
+                        <input  type="text" id="inputServer" pattern="[A-Za-z0-9]{3,}" >
                     </form>
                 </div>
                 <div class="modal-footer">
@@ -168,6 +170,7 @@
 
 
 </body>
+<!--<script src="/static/js/pkg/observer.js"></script>-->
 <script type="module" src="/static/newjsx/new.js"></script>
 
 <!--<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>-->

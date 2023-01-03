@@ -1,9 +1,10 @@
-import _,{map} from "../js/pkg/underscore-esm.js";
+"use strict";
+import _, {map, times} from "../js/pkg/underscore-esm.js";
 import {CreateServer, ListBtnactive, SettingHubModal, ServerBtn, Deletebtn} from "/static/js/pkg/active.js"
 import {listServer,getNewServer} from "../js/datainterface/list.js";
 import {addList} from "../js/pkg/ListUpdate.js";
 (()=>{
-    getNewServer().then(
+    getNewServer().finally(
         LoadNews
     )
 })()

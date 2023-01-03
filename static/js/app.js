@@ -1,11 +1,24 @@
-
+'use strict';
 import {Activebtn,RouterHrefbtnactive} from "./pkg/active.js"
+
 import {Getscript} from "./pkg/Ajax/responsescipt.js"
+import {ObserverAppDOOM} from "./pkg/observer.js";
 
 
+( function () {
 
-( ()=> {
     const appDom=document.getElementById("app")
+
+    window.addEventListener("load", () => {
+        const loaderInner = document.querySelector(".loader_inner");
+        const loader = document.querySelector(".loader");
+
+        setTimeout(() => {
+            loaderInner.style.display = "none";
+            loader.style.display = "none";
+
+        }, 600);
+    });
 
 
     RouterHrefbtnactive('barmenu','a')
@@ -21,39 +34,48 @@ import {Getscript} from "./pkg/Ajax/responsescipt.js"
     }
     init();
 
+    const observe= new ObserverAppDOOM(appDom)
+
+    const mutations = [
+        {
+            type: 'characterData',
+            target: appDom,
+            value: 'new value'
+        },  {
+            type: 'childList',
+            target: appDom,
+            addedNodes: ['new child node'],
+            removedNodes: ['removed child node']
+        }
+    ];
+    observe.onMutation(mutations)
 
 
 
-    let mutationObserver = new MutationObserver(function(mutations) {
-
-        let event = new CustomEvent("appDom", {
-            bubbles: true,detail:{observe:mutations}
-        })
-        setTimeout(() => appDom.dispatchEvent(event));
-        $('#SettingHubModal').modal('hide')
-        $('#CreatePopModalCenter').modal('hide')
-    });
-
-    mutationObserver.observe(appDom, {
-        characterData: true,
-        childList: true,
-        subtree: false,
-        attributeOldValue: true,
-        characterDataOldValue: true,
-
-    });
-    // console.log(window.loadspipt)
-    //     loadscript(el.getAttribute('href'),"#New",urlnew)
-    //new URLSearchParams({
-    //         'user': 'user2'
-    //     }))
-    //{
-    //         username: 'username',
-    //         password: 'password'
-    //     }, {
-    //         headers: {
-    //             'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-    //         }}
 
 })();
 
+
+// function ObserverAppDOOMs (appDom){
+//     let mutationObserver =   new MutationObserver(function(mutations) {
+//
+//         let event =  new CustomEvent("appDom", {
+//             bubbles: true,detail:{observe:mutations}
+//
+//         })
+//         console.log(event)
+//         setTimeout(() =>  appDom.dispatchEvent(event));
+//         $('#SettingHubModal').modal('hide')
+//         $('#CreatePopModalCenter').modal('hide')
+//     });
+//
+//     mutationObserver.observe(appDom, {
+//         characterData: true,
+//         childList: true,
+//         subtree: false,
+//         attributeOldValue: true,
+//         characterDataOldValue: true,
+//
+//     });
+//     console.log(mutationObserver)
+// }

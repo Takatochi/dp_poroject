@@ -98,9 +98,14 @@ const changeKey=(listGroup)=>{
 
 }
 const CreateServer=(ElementById,funcElementById)=>{
+
+    const form=document.getElementById("addSever")
     const el=document.getElementById(funcElementById)
 
+
+
     el.addEventListener('click',()=>{
+
         $('#CreatePopModalCenter').modal('show')
 
     })
@@ -108,6 +113,11 @@ const CreateServer=(ElementById,funcElementById)=>{
     saveModal.addEventListener('click',createButton)
 
     function createButton() {
+
+        if (!isFormFilled(form))
+        {
+            return
+        }
         $('#CreatePopModalCenter').modal('hide');
         const input = document.getElementById('inputServer');
         initServer(input.value)
@@ -121,6 +131,7 @@ const CreateServer=(ElementById,funcElementById)=>{
                 listServer.push(Server);
                 addList(Server, listServer.length - 1);
                 ListBtnactive(ElementById, 'button');
+                form.reset()
             })
             .catch((error) => {
                 console.log(error);
@@ -153,10 +164,15 @@ const ServerBtn=(hash)=>{
 function isFormFilled(form) {
     const inputs = form.querySelectorAll('input');
     for (let i = 0; i < inputs.length; i++) {
-        if (!inputs[i].value) {
-            return false;
-        }
+        const isValid = form.checkValidity();
+        if (!inputs[i].value) return false;
+            // inputs.forEach(e=>{
+            //     e.setCustomValidity("Invalid field.");
+            // })
+
+        if(!isValid) return false;
     }
+
     return true;
 }
 export {Activebtn,ListBtnactive,CreateServer,RouterHrefbtnactive,SettingHubModal,ServerBtn,Deletebtn};

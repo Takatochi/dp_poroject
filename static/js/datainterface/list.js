@@ -1,23 +1,24 @@
-
+"use strict";
 import axios from "/static/js/pkg/axios.min.js"
 const  listServer=[]
 
 const getNewServer= async () => {
-     await axios.post('/New')
+      await axios
+        .post('/New')
         .then ((response)=> {
-            listServer.push(...response.data)
+            if (response.data.length > 0) {
+                listServer.push(...response.data);
+            }
         })
-        .catch(function (error) {
+        .catch((error) => {
             console.log(error);
         });
-
-
 }
 
 
-const initServer= async (name) => {
-
-  return  await axios.post('/Server/init',
+const initServer=async (name) => {
+  return  await axios
+      .post('/Server/init',
          {
              message:name
          },{
@@ -26,8 +27,8 @@ const initServer= async (name) => {
                 }})
 
 }
-const deleteServer= async (id) => {
-   return  await  axios.delete(`/Server/delete/server/${id}`)
+const deleteServer= (id) => {
+   return  axios.delete(`/Server/delete/server/${id}`)
 
 }
 export {listServer,getNewServer,initServer,deleteServer}

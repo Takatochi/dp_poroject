@@ -7,9 +7,9 @@
   const app=document.getElementById("app")
   app.addEventListener('appDom',(e)=>{
 
-    e.detail.observe.forEach(ob=>{
+    e.detail.observe.forEach(_=>{
 
-      if(ob.addedNodes[0].tagName!=="SCRIPT"&&window.location.hash.substr(1)==="Dashboard") {
+      if(window.location.hash.substr(1)==="Dashboard") {
         (function () {
 
           feather.replace({ 'aria-hidden': 'true' })
