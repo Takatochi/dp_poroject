@@ -9,7 +9,7 @@
 
     e.detail.observe.forEach(_=>{
 
-      if(window.location.hash.substr(1)==="Dashboard") {
+      if(!window.onloading&&window.location.hash.substr(1)==="Dashboard") {
         (function () {
 
           feather.replace({ 'aria-hidden': 'true' })

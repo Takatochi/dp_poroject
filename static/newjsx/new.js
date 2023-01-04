@@ -3,19 +3,28 @@ import _, {map, times} from "../js/pkg/underscore-esm.js";
 import {CreateServer, ListBtnactive, SettingHubModal, ServerBtn, Deletebtn} from "/static/js/pkg/active.js"
 import {listServer,getNewServer} from "../js/datainterface/list.js";
 import {addList} from "../js/pkg/ListUpdate.js";
+// import {ObserverAppDOOM} from "../js/pkg/observer";
+const load=()=>{
+    setTimeout(() => {
+        loaderInner.style.display = "none";
+        loader.style.display = "none";
+    }, 600);
+}
 (()=>{
-    getNewServer().finally(
-        LoadNews
-    )
+            getNewServer().then().catch(error=>{
+            console.log(error+" 12")
+        }).finally(
+            LoadNews
+        )
 })()
 
 function LoadNews(){
-
+    console.log(" 13")
     const app=document.getElementById("app")
 
     app.addEventListener('appDom',(e)=>{
 
-            if(window.location.hash.substr(1)==="New") {
+            if(!window.onloading&&window.location.hash.substr(1)==="New") {
 
                 listServer.forEach((obj, index) => {
                     addList(obj, index)

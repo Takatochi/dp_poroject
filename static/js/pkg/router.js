@@ -1,5 +1,5 @@
 'use strict';
-
+import axios from "/static/js/pkg/axios.min.js"
 function Router(routes) {
     try {
         if (!routes) {
@@ -11,7 +11,11 @@ function Router(routes) {
         console.error(e);   
     }
 }
-
+Router.prototype.handleNoHashRoute = function(route) {
+    if (!route.hash) {
+        this.goToRoute(route.htmlName);
+    }
+}
 Router.prototype = {
     routes: undefined,
     rootElem: undefined,
@@ -22,7 +26,7 @@ Router.prototype = {
     init: function () {
         let r = this.routes;
         (function(scope, r) { 
-            window.addEventListener('hashchange', function (e) {
+            window.addEventListener('popstate', function (e) {
                 scope.hasChanged(scope, r);
             });
         })(this, r);
@@ -34,8 +38,6 @@ Router.prototype = {
                 let route = r[i];
                 if(route.isActiveRoute(window.location.hash.substr(1))) {
                     scope.goToRoute(route.htmlName);
-
-
                 }
             }
         } else {
@@ -44,22 +46,36 @@ Router.prototype = {
                 if(route.default) {
                     scope.goToRoute(route.htmlName);
                 }
+                // Call the new function to handle routes without a hash
+
             }
         }
     },
-    goToRoute: function (htmlName) {
-        (function(scope) { 
-            let url = '/static/' + htmlName,
-                xhttp = new XMLHttpRequest();
-            xhttp.onreadystatechange = function () {
-                if (this.readyState === 4 && this.status === 200) {
+    goToRoute: function(htmlName) {
+        window.onloading=true;
+        const template = `<div class="loaderApp" style="display: block;">
+        <div class="loaderApp-inner ball-grid-pulse" >
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+    </div>`
+        this.rootElem.innerHTML = template;
 
-                    scope.rootElem.innerHTML = this.responseText;
+        axios.get(`/static/${htmlName}`)
+            .then(response => {
+                setTimeout(()=>{
+                    this.rootElem.innerHTML = response.data;
+                    window.onloading=false;
+                 },700)
 
-                }
-            };
-            xhttp.open('GET', url, true);
-            xhttp.send();
-        })(this);
+            })
     }
 };
+export {Router}

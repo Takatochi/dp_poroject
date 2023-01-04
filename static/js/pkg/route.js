@@ -1,4 +1,4 @@
-'use stict';
+'use strict';
 
 function Route(name, htmlName, defaultRoute) {
     try {

@@ -63,14 +63,14 @@
 
 <main class="d-flex flex-nowrap">
 <div class="d-flex flex-column flex-shrink-0 text-bg-dark" style="width: 4.5rem;">
-    <a href="/" class="d-block p-3 link-dark text-decoration-none icon" data-bs-toggle="tooltip" data-bs-placement="right" >
 
-        <img class="svg" src="/static/img/logo/logoFT.svg">
-        <span class="visually-hidden">icon</span>
+    <a href="/#" class="d-block  link-dark text-decoration-none icon logoSVG " data-bs-toggle="tooltip" data-bs-placement="right" >
+
+
     </a>
     <ul class="nav nav-pills nav-flush flex-column mb-auto text-center" id="barmenu">
         <li class="nav-item">
-            <a id="go-forward" href="#New"  class="nav-link py-3 border-bottom rounded-0" aria-current="page" data-bs-toggle="tooltip" data-bs-placement="right" aria-label="додому">
+            <a id="go-forward" href="/#New"  class="nav-link py-3 border-bottom rounded-0" aria-current="page" data-bs-toggle="tooltip" data-bs-placement="right" aria-label="додому">
                 <svg class="bi pe-none" width="24" height="24" role="img" aria-label="додому"><use xlink:href="#home"></use></svg>
             </a>
         </li>
@@ -100,9 +100,11 @@
     <div class="loader">
         <div class="loader_inner"></div>
     </div>
+
     <div id="app" class="container_menu ">
 
     </div>
+
 <!--    <div id="app" class="container_menu ">-->
 <!--        {{ template "Dashboard" }}-->
 <!--    </div>-->
@@ -183,7 +185,7 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
 
 <script src="/static/js/pkg/route.js"></script>
-<script src="/static/js/pkg/router.js"></script>
+<script type="module" src="/static/js/pkg/router.js"></script>
 <script type="module"  src="/static/js/app.js"></script>
 
 

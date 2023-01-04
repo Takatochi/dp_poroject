@@ -162,23 +162,11 @@ main{
   width: 50%;
   padding: 15px 5px 15px 5px;
 }
-.icon:hover .svg{
-  animation: rotate;
-  animation-duration: 0.4s;
+.logoSVG{
+  background-image: url('/static/img/logo/logoFT.svg');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  padding: 2rem
 
-}
-@keyframes rotate {
-  10% {
-    height: 40px;
-  }
-  40% {
-    height: 42px;
-  }
-  60%{
-    height: 45px;
-  }
-  100% {
-    height: 47px;
-
-  }
 }

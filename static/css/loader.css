@@ -1,5 +1,9 @@
+:root{
+
+
+}
 .loader {
-    background: none repeat scroll 0 0 #fff;
+    background: none repeat scroll 0 0 var(--body-bg);
     height: 100%;
     width: 100%;
     position: fixed;
@@ -18,9 +22,13 @@
     left: calc(50% - 40px);
     top: calc(50% - 40px);
 }
-@keyframes animate {   0% {
-    transform: rotate(0deg)   }
-    100% {     transform: rotate(220deg)
+@keyframes animate {
+    0% {
+    transform:
+            rotate(0deg)
+}
+    100% {
+        transform: rotate(220deg)
     }
 }
 .loader .loader_inner:after {
@@ -32,14 +40,15 @@
     width: 80px;
     position: absolute; }
 @keyframes animate2 {
-    0% {     box-shadow: inset #b3dfd8 0 0 0 17px;
+    0% {
+        box-shadow: inset #c998ec 0 0 0 17px;
         transform: rotate(-140deg);
     }
     50% {
-                box-shadow: inset #b3dfd8 0 0 0 2px;
+        box-shadow: inset #b0c4dc 0 0 0 2px;
     }
     100% {
-        box-shadow: inset #b3dfd8 0 0 0 17px;
+        box-shadow: inset #d3b1de 0 0 0 17px;
         transform: rotate(140deg);
     }
 }

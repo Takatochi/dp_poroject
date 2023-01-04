@@ -17,7 +17,7 @@ const redirectionURL=()=>{
 
         e.detail.observe.forEach(ob=> {
 
-            if (window.location.hash.substr(1) === "Server") {
+            if (!window.onloading&&window.location.hash.substr(1) === "Server") {
 
                 redirectionURL()
                 console.log(id())

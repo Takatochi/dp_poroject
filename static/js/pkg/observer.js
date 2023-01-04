@@ -32,7 +32,7 @@ ObserverAppDOOM.prototype.dispatchEvent = function (mutations) {
     let event =  new CustomEvent("appDom", {
         bubbles: true, detail: {observe: mutations}
     });
-    // setTimeout(() =>  this.appDom.dispatchEvent(event));
-    this.appDom.dispatchEvent(event);
+    setTimeout(() =>  this.appDom.dispatchEvent(event),10);
+    // this.appDom.dispatchEvent(event);
 }
 export  {ObserverAppDOOM}
