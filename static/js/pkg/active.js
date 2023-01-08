@@ -1,17 +1,27 @@
 import {addList, SettingPupAdd} from "./ListUpdate.js";
 import {initServer, listServer,deleteServer} from "../datainterface/list.js";
 
-const RouterHrefbtnactive =(ElementById,querySelectorAll)=>{
-    const listGroup = document.getElementById('barmenu'),
-        itemGroup = listGroup.querySelectorAll('a')
-    itemGroup.forEach(btn=>{
-        let href= btn.getAttribute('href')
 
-        if (href===location.hash)
-        {
-            btn.classList.add('active')
-        }
-    })
+
+const RouterHrefbtnactive =(ElementById,querySelectorAll)=>{
+
+    const listGroup = document.getElementById('barmenu'),
+        itemGroup = listGroup.querySelectorAll('a'),
+        Default = listGroup.querySelector(".default")
+
+    const isEmpty = (str) => (!str?.length) //return (!str || str.length === 0 )
+
+    if (isEmpty(location.hash))
+    Default.classList.add('active')
+    else {
+        itemGroup.forEach(btn => {
+            let href = btn.getAttribute('href')
+
+            if (href === location.hash)
+                btn.classList.add('active')
+
+        })
+    }
 }
 
 const ListBtnactive = (getElementById ,querySelectorAll)=>{

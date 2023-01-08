@@ -27,7 +27,7 @@ const init=()=> {
    const itemGroup= Activebtn('barmenu',"a")
 
 
-    init();
+
 
 
 })();
@@ -37,7 +37,6 @@ const load = (appDom, loaderInner, loader) =>{
     setTimeout(() => {
         loaderInner.style.display = "none";
         loader.style.display = "none";
-
         const observe= new ObserverAppDOOM(appDom)
 
         const mutations = [
@@ -53,8 +52,10 @@ const load = (appDom, loaderInner, loader) =>{
             }
         ];
         observe.onMutation(mutations)
-        console.log("3")
+        init();
+
     }, 600);
+
 
 }
 
