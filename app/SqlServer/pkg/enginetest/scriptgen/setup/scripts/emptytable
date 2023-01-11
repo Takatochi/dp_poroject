@@ -1,3 +1,0 @@
-exec
-create table emptytable (i mediumint primary key, s text)
-----

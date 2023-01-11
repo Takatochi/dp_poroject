@@ -1,3 +1,0 @@
-exec
-create table loadtable(pk int primary key)
-----

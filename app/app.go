@@ -20,8 +20,12 @@ import (
 
 // ```
 const (
-	dbName    = "mydb"
-	tableName = "mytable"
+	dbName   = "ww3y-34"
+	SOURCE   = "app\\SqlServer\\Serverdata\\wds_44yy50-252982525.sql"
+	PORT     = "3309"
+	HOST     = "127.0.0.1"
+	USER     = "root"
+	PASSWORD = "root"
 )
 
 func Run(config *server.Config, db Database.Database) {
@@ -37,11 +41,12 @@ func Run(config *server.Config, db Database.Database) {
 	}()
 	// Виконуємо команду завантаження дампу у MySQL
 	//cmd := exec.Command("mysql", "-u", "root", "-proot", "ww3y-34", "<", "app/SqlServer/Serverdata/wds_44yy50-252982525.sql")
-	cmd := exec.Command("mysql", "--host=127.0.0.1", "--port=3309", "--password=root", "-u", "root", "ww3y-34", "-e", "source app\\SqlServer\\Serverdata\\wds_44yy50-252982525.sql")
-	fmt.Println(cmd)
+	cmd := exec.Command("mysql", "--host="+HOST, "--port="+PORT, "--password="+PASSWORD, "--user="+USER, dbName, "-e", "source "+SOURCE)
+	//fmt.Println(cmd)
 	// Записуємо результат виконання команди у буфер
 	//var out bytes.Buffer
 	//cmd.Stdout = &out
+	//fmt.Print(out.Cap())
 	err := cmd.Run()
 
 	if err != nil {
@@ -61,13 +66,11 @@ func Run(config *server.Config, db Database.Database) {
 	defer database.Close()
 
 	// init bd
-	store := make(chan *sqlBd.Store, 1)
-	go func() {
-		store <- sqlBd.New(database)
-	}()
+	var store *sqlBd.Store
+	store = sqlBd.New(database)
 
 	// init handler
-	had := handler.NewHandler(<-store)
+	had := handler.NewHandler(store)
 
 	go func() {
 		if err := srv.Run(config, had); !errors.Is(err, http.ErrServerClosed) {
