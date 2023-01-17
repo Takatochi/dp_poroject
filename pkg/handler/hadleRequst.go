@@ -7,22 +7,25 @@ import (
 	"project/app/model"
 	"project/pkg/logger"
 	"project/pkg/port"
-	"project/pkg/store"
+	StoreBD "project/pkg/store"
 	"strconv"
 )
 
 type Handler struct {
 	router *gin.Engine
-	store  store.Store
+	store  StoreBD.Store
+	stores StoreBD.ListenStore
 }
 type Index struct {
 	Handler *Handler
 }
 
-func NewHandler(store store.Store) *Handler {
+func NewHandler(store StoreBD.Store) *Handler {
+	storeBD := &StoreBD.Listen{Store: store}
 	return &Handler{
 		router: gin.New(),
 		store:  store,
+		stores: storeBD,
 	}
 
 }
@@ -48,8 +51,9 @@ func (h *Index) Index(ctx *gin.Context) {
 
 // New curl -d "user=user1" -X POST http://localhost:8088/New
 func (h *Index) New(ctx *gin.Context) {
+	//stores, err := h.Handler.stores.StoreBD().Server().Find()
 
-	store, err := h.Handler.store.Server().Find()
+	store, err := h.Handler.stores.StoreBD().Server().Find()
 	if err != nil {
 		logger.Error(err)
 		return

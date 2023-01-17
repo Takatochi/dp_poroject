@@ -20,20 +20,27 @@ import (
 
 // ```
 const (
-	dbName   = "ww3y-34"
-	SOURCE   = "app\\SqlServer\\Serverdata\\wds_44yy50-252982525.sql"
+	dbName   = "ww3y_34"
+	SOURCE   = "ServerData\\wds_44yy50-252982525.sql"
 	PORT     = "3309"
 	HOST     = "127.0.0.1"
 	USER     = "root"
 	PASSWORD = "root"
+	Version  = "8.14 gorgon medusa"
 )
 
 func Run(config *server.Config, db Database.Database) {
+	cfgMLR := server.NewMysqliConfig(dbName, HOST, 3309, Version, nil, nil)
 	go func() {
-		//mysql --host=127.0.0.1 --port=3309 -u root  mydb -e "source J:\dump\log\wds_99yy36-242972424.sql"
-		//mysql --host=127.0.0.1 --port=3309 -u root  ww3y-34 -e "Select * From server"
+		err := SqlServer.Start(cfgMLR)
+		if err != nil {
+			logger.Error(err)
+		}
 
-		err := SqlServer.Start()
+	}()
+	cfgMLRs := server.NewMysqliConfig("kazuality", HOST, 3310, Version, nil, nil)
+	go func() {
+		err := SqlServer.Start(cfgMLRs)
 		if err != nil {
 			logger.Error(err)
 		}
