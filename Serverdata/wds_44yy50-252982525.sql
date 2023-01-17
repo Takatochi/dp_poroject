@@ -37,7 +37,7 @@ CREATE TABLE `server` (
 LOCK TABLES server WRITE;
 /*!40000 ALTER TABLE server DISABLE KEYS */;
 
-INSERT INTO server VALUES ('2','Load data science','8678'),('3','s2','5634'),('4','ss3','2342');
+INSERT INTO server VALUES ('2','Load data science','8678'),('3','s','5634'),('4','ss3','2342');
 
 /*!40000 ALTER TABLE server ENABLE KEYS */;
 UNLOCK TABLES;

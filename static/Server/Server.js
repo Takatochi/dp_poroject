@@ -6,7 +6,7 @@ const IDServer=()=>{
 const redirectionURL=()=>{
     if(IDServer()!==undefined)
       return
-    location.href="/"
+    location.href="/#"
 
 }
 ((id)=>{
@@ -20,7 +20,7 @@ const redirectionURL=()=>{
             if (!window.onloading&&window.location.hash.substr(1) === "Server") {
 
                 redirectionURL()
-                console.log(id())
+
 
             }
         })

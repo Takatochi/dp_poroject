@@ -26,7 +26,7 @@ Router.prototype = {
     init: function () {
         let r = this.routes;
         (function(scope, r) { 
-            window.addEventListener('popstate', function (e) {
+            window.addEventListener('hashchange', function (e) {
                 scope.hasChanged(scope, r);
             });
         })(this, r);

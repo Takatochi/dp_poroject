@@ -2,9 +2,15 @@ package handler
 
 import (
 	"fmt"
+	sqle "github.com/dolthub/go-mysql-server"
+	"github.com/dolthub/go-mysql-server/memory"
+	"github.com/dolthub/go-mysql-server/server"
+	"github.com/dolthub/go-mysql-server/sql/analyzer"
+	"github.com/dolthub/go-mysql-server/sql/information_schema"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"project/app/model"
+	"project/pkg/MYSQLserver"
 	"project/pkg/logger"
 	"project/pkg/port"
 	StoreBD "project/pkg/store"
@@ -102,4 +108,33 @@ func (h *Index) DeleteSever(ctx *gin.Context) {
 	}
 
 	ctx.Status(http.StatusOK)
+}
+
+func (h *Index) StartVirtualServer(ctx *gin.Context) {
+	go startVirtualSqlserver("localhost", "alpha", 3310)
+	ctx.Status(http.StatusOK)
+}
+func startVirtualSqlserver(address, dbname string, port int32) {
+	config := &sqle.Config{
+		VersionPostfix:     "Version",
+		IsReadOnly:         false,
+		IsServerLocked:     false,
+		IncludeRootAccount: false,
+	}
+
+	cfg := &server.Config{
+		Protocol: "tcp",
+		Address:  fmt.Sprintf("%s:%d", address, port),
+		Version:  "Version",
+	}
+
+	db := memory.NewDatabase(dbname)
+	analyzer := analyzer.NewDefault(analyzer.NewDatabaseProvider(db, information_schema.NewInformationSchemaDatabase()))
+
+	MYs := MYSQLserver.NewMySqliDefault(cfg, analyzer, config)
+
+	if err := MYs.Run(); err != nil {
+		logger.Error(err)
+	}
+
 }

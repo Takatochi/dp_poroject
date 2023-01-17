@@ -33,9 +33,10 @@ function LoadNews(){
                 CreateServer("list-group", "create_btn")
                 ServerBtn("#Server")
                 Deletebtn('list-group', "delete_btn")
-                app.addEventListener('click',()=>{
-                   SettingHubModal('list-group',listServer)
-                })
+                SettingHubModal('list-group',listServer)
+                // app.addEventListener('click',()=>{
+                //
+                // })
 
             }
 

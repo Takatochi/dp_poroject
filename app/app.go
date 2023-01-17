@@ -3,14 +3,14 @@ package app
 import (
 	"context"
 	"errors"
-	"fmt"
 	"net/http"
 	"os"
-	"os/exec"
 	"os/signal"
+
 	"project/app/SqlServer"
 	"project/app/server"
 	"project/pkg/Database"
+	mysqldump "project/pkg/Database/dumpmysql"
 	"project/pkg/handler"
 	"project/pkg/logger"
 	"project/pkg/store/sqlBd"
@@ -38,27 +38,18 @@ func Run(config *server.Config, db Database.Database) {
 		}
 
 	}()
-	cfgMLRs := server.NewMysqliConfig("kazuality", HOST, 3310, Version, nil, nil)
-	go func() {
-		err := SqlServer.Start(cfgMLRs)
-		if err != nil {
-			logger.Error(err)
-		}
 
-	}()
 	// Виконуємо команду завантаження дампу у MySQL
-	//cmd := exec.Command("mysql", "-u", "root", "-proot", "ww3y-34", "<", "app/SqlServer/Serverdata/wds_44yy50-252982525.sql")
-	cmd := exec.Command("mysql", "--host="+HOST, "--port="+PORT, "--password="+PASSWORD, "--user="+USER, dbName, "-e", "source "+SOURCE)
-	//fmt.Println(cmd)
-	// Записуємо результат виконання команди у буфер
-	//var out bytes.Buffer
-	//cmd.Stdout = &out
-	//fmt.Print(out.Cap())
-	err := cmd.Run()
-
-	if err != nil {
-		fmt.Println(err)
-	}
+	//cmd := exec.Command("mysql", "--host="+HOST, "--port="+PORT, "--password="+PASSWORD, "--user="+USER, dbName, "-e", "source "+SOURCE)
+	////fmt.Println(cmd)
+	//// Записуємо результат виконання команди у буфер
+	////var out bytes.Buffer
+	////cmd.Stdout = &out
+	////fmt.Print(out.Cap())
+	//err := cmd.Run()
+	//if err != nil {
+	//	fmt.Println(err)
+	//}
 
 	t := time.Now()
 
@@ -67,11 +58,15 @@ func Run(config *server.Config, db Database.Database) {
 	database, err := db.Open(config)
 	if err != nil {
 		logger.Error(err)
-
 		return
 	}
-	defer database.Close()
+	mysqldump.Load(database, "ServerData/wds_44yy50-252982525.sql")
 
+	//if err := Database.SaveFile("ServerData", "ww3y_34", database); err != nil {
+	//	logger.Error(err)
+	//	return
+	//}
+	defer database.Close()
 	// init bd
 	var store *sqlBd.Store
 	store = sqlBd.New(database)

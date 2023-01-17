@@ -22,13 +22,13 @@ import (
 // +----------+-------------------+-------------------------------+---------------------+
 // ```
 
-func Start(MLR *server2.MysqliConfig) error {
+func Start(cfg *server2.MysqliConfig) error {
 
-	db := memory.NewDatabase(MLR.DbName)
+	db := memory.NewDatabase(cfg.DbName)
 
 	analyzer := analyzer.NewDefault(analyzer.NewDatabaseProvider(db, information_schema.NewInformationSchemaDatabase()))
 
-	MYs := MYSQLserver.NewMySqliDefault(MLR.Config, analyzer, MLR.Cfg)
+	MYs := MYSQLserver.NewMySqliDefault(cfg.Config, analyzer, cfg.Cfg)
 
 	return MYs.Run()
 
