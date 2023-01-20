@@ -75,7 +75,7 @@ func configureRouter(h *handler.Handler, i *handler.Index) {
 	{
 		server.POST("/init", i.Initiation)
 		server.DELETE("/delete/server/:id", i.DeleteSever)
-		server.GET("/Start", i.StartVirtualServer)
+		server.GET("/Start/:port", i.StartVirtualServer)
 	}
 
 }

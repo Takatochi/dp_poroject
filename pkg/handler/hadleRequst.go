@@ -2,15 +2,10 @@ package handler
 
 import (
 	"fmt"
-	sqle "github.com/dolthub/go-mysql-server"
-	"github.com/dolthub/go-mysql-server/memory"
-	"github.com/dolthub/go-mysql-server/server"
-	"github.com/dolthub/go-mysql-server/sql/analyzer"
-	"github.com/dolthub/go-mysql-server/sql/information_schema"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"project/app/model"
-	"project/pkg/MYSQLserver"
+	"project/pkg/handler/mapHadler"
 	"project/pkg/logger"
 	"project/pkg/port"
 	StoreBD "project/pkg/store"
@@ -111,30 +106,41 @@ func (h *Index) DeleteSever(ctx *gin.Context) {
 }
 
 func (h *Index) StartVirtualServer(ctx *gin.Context) {
-	go startVirtualSqlserver("localhost", "alpha", 3310)
-	ctx.Status(http.StatusOK)
-}
-func startVirtualSqlserver(address, dbname string, port int32) {
-	config := &sqle.Config{
-		VersionPostfix:     "Version",
-		IsReadOnly:         false,
-		IsServerLocked:     false,
-		IncludeRootAccount: false,
-	}
 
-	cfg := &server.Config{
-		Protocol: "tcp",
-		Address:  fmt.Sprintf("%s:%d", address, port),
-		Version:  "Version",
-	}
-
-	db := memory.NewDatabase(dbname)
-	analyzer := analyzer.NewDefault(analyzer.NewDatabaseProvider(db, information_schema.NewInformationSchemaDatabase()))
-
-	MYs := MYSQLserver.NewMySqliDefault(cfg, analyzer, config)
-
-	if err := MYs.Run(); err != nil {
+	portGet := ctx.Param("port")
+	ports, err := strconv.Atoi(portGet)
+	if err != nil {
+		ctx.JSON(http.StatusConflict, gin.H{"error": err})
 		logger.Error(err)
+		return
 	}
 
+	errs := port.GetQuestionFreePort("localhost", ports)
+	if errs != nil {
+		logger.Error(errs)
+		ctx.JSON(http.StatusTooManyRequests, fmt.Sprintf("Server with port %d already use", ports))
+		return
+	}
+
+	ListServerSql := make(chan []mapHadler.ListServerSql, 1)
+	go func() {
+		fmt.Println(fmt.Sprintf("Server with port %d already use", ports))
+		ListServerSql <- mapHadler.NewServerSql("localhost", "alpha", int32(ports))
+		close(ListServerSql)
+	}()
+	serverList := <-ListServerSql
+
+	for _, data := range serverList {
+		if data.Port == int32(ports) {
+			err = data.Server.Stop()
+			if err != nil {
+				ctx.JSON(http.StatusAccepted, fmt.Sprintf("Server with port %d stoped", ports))
+				return
+			}
+		}
+
+	}
+
+	ctx.JSON(http.StatusOK, fmt.Sprintf("Server with port %d start", ports))
+	return
 }

@@ -1,6 +1,7 @@
 package port
 
 import (
+	"fmt"
 	"net"
 )
 
@@ -46,4 +47,19 @@ func GetFreePorts(count int) ([]int, error) {
 		ports = append(ports, l.Addr().(*net.TCPAddr).Port)
 	}
 	return ports, nil
+}
+func GetQuestionFreePort(address string, port int) error {
+
+	addr, err := net.ResolveTCPAddr("tcp", fmt.Sprintf("%s:%d", address, port))
+	if err != nil {
+		return err
+	}
+
+	l, err := net.ListenTCP("tcp", addr)
+	if err != nil {
+		return err
+	}
+	defer l.Close()
+
+	return nil
 }

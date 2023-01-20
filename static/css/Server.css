@@ -1,0 +1,5 @@
+div> a{
+
+    font-size: calc(1.25rem + .5vw);
+    margin-left: 5px;
+}
