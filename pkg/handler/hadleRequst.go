@@ -5,24 +5,28 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"project/app/model"
+	"project/pkg/handler/mapHadler"
 	"project/pkg/logger"
 	"project/pkg/port"
-	"project/pkg/store"
+	StoreBD "project/pkg/store"
 	"strconv"
 )
 
 type Handler struct {
 	router *gin.Engine
-	store  store.Store
+	store  StoreBD.Store
+	stores StoreBD.ListenStore
 }
 type Index struct {
 	Handler *Handler
 }
 
-func NewHandler(store store.Store) *Handler {
+func NewHandler(store StoreBD.Store) *Handler {
+	storeBD := &StoreBD.Listen{Store: store}
 	return &Handler{
 		router: gin.New(),
 		store:  store,
+		stores: storeBD,
 	}
 
 }
@@ -48,8 +52,9 @@ func (h *Index) Index(ctx *gin.Context) {
 
 // New curl -d "user=user1" -X POST http://localhost:8088/New
 func (h *Index) New(ctx *gin.Context) {
+	//stores, err := h.Handler.stores.StoreBD().Server().Find()
 
-	store, err := h.Handler.store.Server().Find()
+	store, err := h.Handler.stores.StoreBD().Server().Find()
 	if err != nil {
 		logger.Error(err)
 		return
@@ -98,4 +103,44 @@ func (h *Index) DeleteSever(ctx *gin.Context) {
 	}
 
 	ctx.Status(http.StatusOK)
+}
+
+func (h *Index) StartVirtualServer(ctx *gin.Context) {
+
+	portGet := ctx.Param("port")
+	ports, err := strconv.Atoi(portGet)
+	if err != nil {
+		ctx.JSON(http.StatusConflict, gin.H{"error": err})
+		logger.Error(err)
+		return
+	}
+
+	errs := port.GetQuestionFreePort("localhost", ports)
+	if errs != nil {
+		logger.Error(errs)
+		ctx.JSON(http.StatusTooManyRequests, fmt.Sprintf("Server with port %d already use", ports))
+		return
+	}
+
+	ListServerSql := make(chan []mapHadler.ListServerSql, 1)
+	go func() {
+		fmt.Println(fmt.Sprintf("Server with port %d already use", ports))
+		ListServerSql <- mapHadler.NewServerSql("localhost", "alpha", int32(ports))
+		close(ListServerSql)
+	}()
+	serverList := <-ListServerSql
+
+	for _, data := range serverList {
+		if data.Port == int32(ports) {
+			err = data.Server.Stop()
+			if err != nil {
+				ctx.JSON(http.StatusAccepted, fmt.Sprintf("Server with port %d stoped", ports))
+				return
+			}
+		}
+
+	}
+
+	ctx.JSON(http.StatusOK, fmt.Sprintf("Server with port %d start", ports))
+	return
 }

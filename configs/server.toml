@@ -1,5 +1,5 @@
 
 bind_addr= "8088"
-database_url = "root:root@tcp(127.0.0.1:3309)/ww3y-34"
+database_url = "root:root@tcp(127.0.0.1:3309)/ww3y_34"
 driverName = "mysql"
 

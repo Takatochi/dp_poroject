@@ -29,6 +29,7 @@ func main() {
 		logger.Warnf("Warn to stop config: %v", err)
 		return
 	}
+
 	// Run App ...
 	var bd = new(Database.MySQLDatabase)
 	app.Run(config, bd)

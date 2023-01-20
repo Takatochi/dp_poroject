@@ -2,6 +2,7 @@ package sqlBd
 
 import (
 	"database/sql"
+	"fmt"
 	"project/pkg/store"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -35,10 +36,11 @@ func (s *Store) User() store.UserRepository {
 
 // Server interface for add parameters Store.Server()....
 func (s *Store) Server() store.ListRepository {
+	fmt.Println("save")
 	if s.listRepository != nil {
 		return s.listRepository
 	}
-
+	//s.db.Begin()
 	s.listRepository = &ListRepository{
 		store: s,
 	}

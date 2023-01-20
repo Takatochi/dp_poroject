@@ -150,18 +150,20 @@ const CreateServer=(ElementById,funcElementById)=>{
 
 }
 const SettingHubModal=(ElementById,obj)=>{
-
     const listGroup = document.getElementById(ElementById),
     itemGroup=listGroup.querySelectorAll('button')
-     itemGroup.forEach(item=>  {
-        if (item.getAttribute('active')) {
-            item.addEventListener('dblclick', function () {
-                $('#SettingHubModal').modal('show')
-                SettingPupAdd(obj, this)
-            })
-        }
+    listGroup.addEventListener('click', ()=>{
+        itemGroup.forEach(item=>  {
+            if (item.getAttribute('active')) {
+                item.addEventListener('dblclick', function () {
+                    $('#SettingHubModal').modal('show')
+                    SettingPupAdd(obj, this)
+                })
+            }
 
+        })
     })
+
 
 }
 const ServerBtn=(hash)=>{

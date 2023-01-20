@@ -1,8 +1,13 @@
 package store
 
 import (
+	"fmt"
 	"project/app/model"
 )
+
+type ListenStore interface {
+	StoreBD() Store
+}
 
 // UserRepository ...
 type UserRepository interface {
@@ -21,4 +26,12 @@ type ListRepository interface {
 type Store interface {
 	User() UserRepository
 	Server() ListRepository
+}
+type Listen struct {
+	Store
+}
+
+func (l *Listen) StoreBD() Store {
+	fmt.Println("load")
+	return l
 }
