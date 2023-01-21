@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"net/http"
 	"os"
@@ -66,7 +67,13 @@ func Run(config *server.Config, db Database.Database) {
 	//	logger.Error(err)
 	//	return
 	//}
-	defer database.Close()
+
+	defer func(database *sql.DB) {
+		err := database.Close()
+		if err != nil {
+			logger.Error("failed to close server: %v", err)
+		}
+	}(database)
 	// init bd
 	var store *sqlBd.Store
 	store = sqlBd.New(database)

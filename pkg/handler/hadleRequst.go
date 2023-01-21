@@ -9,8 +9,11 @@ import (
 	"project/pkg/logger"
 	"project/pkg/port"
 	StoreBD "project/pkg/store"
+	"sort"
 	"strconv"
 )
+
+var serverList []mapHadler.ListServerSql
 
 type Handler struct {
 	router *gin.Engine
@@ -124,23 +127,60 @@ func (h *Index) StartVirtualServer(ctx *gin.Context) {
 
 	ListServerSql := make(chan []mapHadler.ListServerSql, 1)
 	go func() {
-		fmt.Println(fmt.Sprintf("Server with port %d already use", ports))
+		ctx.JSON(http.StatusOK, fmt.Sprintf("Server with port %d start", ports))
+		logger.Infof("Server with port %d already use", ports)
 		ListServerSql <- mapHadler.NewServerSql("localhost", "alpha", int32(ports))
 		close(ListServerSql)
 	}()
-	serverList := <-ListServerSql
 
-	for _, data := range serverList {
-		if data.Port == int32(ports) {
-			err = data.Server.Stop()
-			if err != nil {
-				ctx.JSON(http.StatusAccepted, fmt.Sprintf("Server with port %d stoped", ports))
-				return
-			}
-		}
+	//serverList := <-ListServerSql
+	serverList = <-ListServerSql
 
+	sort.Slice(serverList, func(i, j int) bool {
+		return serverList[i].Port <= serverList[j].Port
+	})
+	//for _, data := range *serverList {
+	//	if data.Port == int32(ports) {
+	//		err = data.Server.Stop()
+	//		if err != nil {
+	//			ctx.JSON(http.StatusAccepted, fmt.Sprintf("Server with port %d stoped", ports))
+	//			return
+	//		}
+	//	}
+	//	logger.Info(data)
+	//}
+
+}
+
+func (h *Index) CloseVirtualServer(ctx *gin.Context) {
+	portGet := ctx.Param("port")
+	ports, err := strconv.Atoi(portGet)
+	if err != nil {
+		ctx.JSON(http.StatusConflict, gin.H{"error": err})
+		logger.Error(err)
+		return
 	}
 
-	ctx.JSON(http.StatusOK, fmt.Sprintf("Server with port %d start", ports))
-	return
+	idx := sort.Search(len(serverList), func(i int) bool {
+		return serverList[i].Port >= int32(ports)
+	})
+
+	if idx < len(serverList) && serverList[idx].Port == int32(ports) {
+
+		err := serverList[idx].Server.Stop()
+		if err != nil {
+			logger.Error(err)
+			ctx.JSON(http.StatusBadGateway, fmt.Sprintf("Server have problem with closed this actuality ports ?/|? %d", ports))
+		}
+		ctx.JSON(http.StatusAccepted, fmt.Sprintf("Server with port %d stoped", ports))
+	} else {
+		ctx.JSON(http.StatusFound, fmt.Sprintf("Found noting: %d/%d", idx, ports))
+	}
+	//for _, data := range serverList {
+	//	if data.Port == int32(ports) {
+	//
+	//	}
+	//}
+
+	//ctx.JSON(http.StatusOK, "ok")
 }
