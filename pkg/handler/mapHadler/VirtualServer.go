@@ -26,7 +26,7 @@ type ListServerSql struct {
 
 var serverTree = redblacktree.NewWithIntComparator()
 
-func NewServerSql(address, dbname string, port int32) *redblacktree.Tree {
+func NewServerSql(address, dbname string, port int32) (*redblacktree.Tree, error) {
 
 	config := &sqle.Config{
 		VersionPostfix:     Version,
@@ -63,12 +63,13 @@ func NewServerSql(address, dbname string, port int32) *redblacktree.Tree {
 	select {
 	case err, open := <-errs:
 		if open {
-			logger.Error(err)
+			return nil, err
 		}
-	case <-time.After(time.Second):
-		// handle timeout
+	case <-time.After(time.Millisecond):
+
 	}
-	return serverTree
+
+	return serverTree, nil
 }
 
 func startVirtualSqlserver(srv *MYSQLserver.MySqli) error {
