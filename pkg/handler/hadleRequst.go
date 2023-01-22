@@ -2,6 +2,7 @@ package handler
 
 import (
 	"fmt"
+	"github.com/emirpasic/gods/trees/redblacktree"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"project/app/model"
@@ -9,8 +10,16 @@ import (
 	"project/pkg/logger"
 	"project/pkg/port"
 	StoreBD "project/pkg/store"
+	"project/pkg/stringFMT"
 	"strconv"
 )
+
+var ServerTree *redblacktree.Tree
+
+type serverCFG struct {
+	Port int32  `json:"port"`
+	Name string `json:"name"`
+}
 
 type Handler struct {
 	router *gin.Engine
@@ -107,6 +116,39 @@ func (h *Index) DeleteSever(ctx *gin.Context) {
 
 func (h *Index) StartVirtualServer(ctx *gin.Context) {
 
+	var srvCFG = new(serverCFG)
+
+	if err := ctx.ShouldBindJSON(&srvCFG); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	fmt.Println(srvCFG)
+
+	ctx.JSON(http.StatusOK, gin.H{"message": "Server started"})
+
+	errs := port.GetQuestionFreePort("localhost", srvCFG.Port)
+	if errs != nil {
+		logger.Error(errs)
+		ctx.JSON(http.StatusTooManyRequests, gin.H{"message": fmt.Sprintf("Server with port %d already use", srvCFG.Port)})
+		return
+	}
+
+	//ListServerSql := make(chan []mapHadler.ListServerSql, 1)
+	serverTree := make(chan *redblacktree.Tree, 1)
+	go func() {
+		ctx.JSON(http.StatusOK, gin.H{"message": fmt.Sprintf("Server with port %d start", srvCFG.Port)})
+		logger.Infof("Server with port %d already use", srvCFG.Port)
+		serverTree <- mapHadler.NewServerSql("localhost", stringFMT.StringTitleJoin(srvCFG.Name), srvCFG.Port)
+
+		close(serverTree)
+	}()
+
+	ServerTree = <-serverTree
+
+}
+
+func (h *Index) CloseVirtualServer(ctx *gin.Context) {
 	portGet := ctx.Param("port")
 	ports, err := strconv.Atoi(portGet)
 	if err != nil {
@@ -114,33 +156,21 @@ func (h *Index) StartVirtualServer(ctx *gin.Context) {
 		logger.Error(err)
 		return
 	}
-
-	errs := port.GetQuestionFreePort("localhost", ports)
-	if errs != nil {
-		logger.Error(errs)
-		ctx.JSON(http.StatusTooManyRequests, fmt.Sprintf("Server with port %d already use", ports))
-		return
-	}
-
-	ListServerSql := make(chan []mapHadler.ListServerSql, 1)
-	go func() {
-		fmt.Println(fmt.Sprintf("Server with port %d already use", ports))
-		ListServerSql <- mapHadler.NewServerSql("localhost", "alpha", int32(ports))
-		close(ListServerSql)
-	}()
-	serverList := <-ListServerSql
-
-	for _, data := range serverList {
-		if data.Port == int32(ports) {
-			err = data.Server.Stop()
+	if server, found := ServerTree.Get(ports); found {
+		fmt.Printf("server type: %T ", server)
+		if server != nil {
+			fmt.Printf("Server found with port %d ", server.(mapHadler.ListServerSql).Port)
+			err := server.(mapHadler.ListServerSql).Server.Stop()
 			if err != nil {
-				ctx.JSON(http.StatusAccepted, fmt.Sprintf("Server with port %d stoped", ports))
+				ctx.JSON(http.StatusBadGateway, gin.H{"message": fmt.Sprintf("Server have problem with closed this actuality ports ?/|? %d", ports)})
+				logger.Error(err)
 				return
 			}
+			ctx.JSON(http.StatusAccepted, gin.H{"message": fmt.Sprintf("Server with port %d stoped", ports)})
 		}
-
+	} else {
+		ctx.JSON(http.StatusFound, gin.H{"message": fmt.Sprintf("Found noting: %d", ports)})
+		logger.Info("Server not found")
 	}
 
-	ctx.JSON(http.StatusOK, fmt.Sprintf("Server with port %d start", ports))
-	return
 }

@@ -7,6 +7,7 @@ import (
 	"github.com/dolthub/go-mysql-server/server"
 	"github.com/dolthub/go-mysql-server/sql/analyzer"
 	"github.com/dolthub/go-mysql-server/sql/information_schema"
+	"github.com/emirpasic/gods/trees/redblacktree"
 	"project/pkg/MYSQLserver"
 	"project/pkg/logger"
 	"time"
@@ -21,9 +22,12 @@ type ListServerSql struct {
 	Server *MYSQLserver.MySqli
 }
 
-var listServerSql []ListServerSql
+//var listServerSql []ListServerSql
 
-func NewServerSql(address, dbname string, port int32) []ListServerSql {
+var serverTree = redblacktree.NewWithIntComparator()
+
+func NewServerSql(address, dbname string, port int32) *redblacktree.Tree {
+
 	config := &sqle.Config{
 		VersionPostfix:     Version,
 		IsReadOnly:         false,
@@ -53,7 +57,8 @@ func NewServerSql(address, dbname string, port int32) []ListServerSql {
 		close(errs)
 	}()
 
-	listServerSql = append(listServerSql, ListServerSql{Port: port, Server: srv})
+	//listServerSql = append(listServerSql, ListServerSql{Port: port, Server: srv})
+	serverTree.Put(int(port), ListServerSql{Port: port, Server: srv})
 
 	select {
 	case err, open := <-errs:
@@ -63,7 +68,7 @@ func NewServerSql(address, dbname string, port int32) []ListServerSql {
 	case <-time.After(time.Second):
 		// handle timeout
 	}
-	return listServerSql
+	return serverTree
 }
 
 func startVirtualSqlserver(srv *MYSQLserver.MySqli) error {

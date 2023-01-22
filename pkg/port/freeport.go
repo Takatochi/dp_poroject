@@ -48,7 +48,7 @@ func GetFreePorts(count int) ([]int, error) {
 	}
 	return ports, nil
 }
-func GetQuestionFreePort(address string, port int) error {
+func GetQuestionFreePort(address string, port int32) error {
 
 	addr, err := net.ResolveTCPAddr("tcp", fmt.Sprintf("%s:%d", address, port))
 	if err != nil {

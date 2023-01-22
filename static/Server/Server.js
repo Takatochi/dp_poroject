@@ -1,6 +1,9 @@
 "use strict";
 
 
+import {startServer} from "../js/datainterface/list.js";
+import {play,stop} from "./active.js";
+
 (()=>{
     const app=document.getElementById("app");
     app.addEventListener('appDom',(e)=>{
@@ -31,10 +34,10 @@ const main = ()=>{
         ]
 
     );
-
     infoCart(serverData.get(0).ServerName,serverData.get(0).ServerPort);
 
-
+    play(serverData)
+    stop(serverData.get(0).ServerPort)
 
 
 }

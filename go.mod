@@ -5,6 +5,7 @@ go 1.18
 require (
 	github.com/BurntSushi/toml v1.2.0
 	github.com/dolthub/go-mysql-server v0.14.0
+	github.com/emirpasic/gods v1.18.1
 	github.com/gin-contrib/cors v1.4.0
 	github.com/gin-gonic/gin v1.8.1
 	github.com/go-ozzo/ozzo-validation v3.6.0+incompatible
