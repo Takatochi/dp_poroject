@@ -31,4 +31,15 @@ const deleteServer= (id) => {
    return  axios.delete(`/Server/delete/server/${id}`)
 
 }
-export {listServer,getNewServer,initServer,deleteServer}
+const stopServer= (port) => {
+    return  axios.delete(`/Server/Close/${port}`)
+
+}
+const startServer =async (serverMap)=>{
+  return  await axios.post('/Server/Start',{
+
+        port: serverMap.get(0).ServerPort,
+        name: serverMap.get(0).ServerName,
+    })
+}
+export {listServer,getNewServer,initServer,deleteServer,startServer,stopServer}

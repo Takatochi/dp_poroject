@@ -2,6 +2,7 @@ package handler
 
 import (
 	"fmt"
+	"github.com/emirpasic/gods/trees/redblacktree"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"project/app/model"
@@ -9,11 +10,16 @@ import (
 	"project/pkg/logger"
 	"project/pkg/port"
 	StoreBD "project/pkg/store"
-	"sort"
+	"project/pkg/stringFMT"
 	"strconv"
 )
 
-var serverList []mapHadler.ListServerSql
+var ServerTree *redblacktree.Tree
+
+type serverCFG struct {
+	Port int32  `json:"port"`
+	Name string `json:"name"`
+}
 
 type Handler struct {
 	router *gin.Engine
@@ -110,45 +116,35 @@ func (h *Index) DeleteSever(ctx *gin.Context) {
 
 func (h *Index) StartVirtualServer(ctx *gin.Context) {
 
-	portGet := ctx.Param("port")
-	ports, err := strconv.Atoi(portGet)
-	if err != nil {
-		ctx.JSON(http.StatusConflict, gin.H{"error": err})
-		logger.Error(err)
+	var srvCFG = new(serverCFG)
+
+	if err := ctx.ShouldBindJSON(&srvCFG); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	errs := port.GetQuestionFreePort("localhost", ports)
+	fmt.Println(srvCFG)
+
+	ctx.JSON(http.StatusOK, gin.H{"message": "Server started"})
+
+	errs := port.GetQuestionFreePort("localhost", srvCFG.Port)
 	if errs != nil {
 		logger.Error(errs)
-		ctx.JSON(http.StatusTooManyRequests, fmt.Sprintf("Server with port %d already use", ports))
+		ctx.JSON(http.StatusTooManyRequests, gin.H{"message": fmt.Sprintf("Server with port %d already use", srvCFG.Port)})
 		return
 	}
 
-	ListServerSql := make(chan []mapHadler.ListServerSql, 1)
+	//ListServerSql := make(chan []mapHadler.ListServerSql, 1)
+	serverTree := make(chan *redblacktree.Tree, 1)
 	go func() {
-		ctx.JSON(http.StatusOK, fmt.Sprintf("Server with port %d start", ports))
-		logger.Infof("Server with port %d already use", ports)
-		ListServerSql <- mapHadler.NewServerSql("localhost", "alpha", int32(ports))
-		close(ListServerSql)
+		ctx.JSON(http.StatusOK, gin.H{"message": fmt.Sprintf("Server with port %d start", srvCFG.Port)})
+		logger.Infof("Server with port %d already use", srvCFG.Port)
+		serverTree <- mapHadler.NewServerSql("localhost", stringFMT.StringTitleJoin(srvCFG.Name), srvCFG.Port)
+
+		close(serverTree)
 	}()
 
-	//serverList := <-ListServerSql
-	serverList = <-ListServerSql
-
-	sort.Slice(serverList, func(i, j int) bool {
-		return serverList[i].Port <= serverList[j].Port
-	})
-	//for _, data := range *serverList {
-	//	if data.Port == int32(ports) {
-	//		err = data.Server.Stop()
-	//		if err != nil {
-	//			ctx.JSON(http.StatusAccepted, fmt.Sprintf("Server with port %d stoped", ports))
-	//			return
-	//		}
-	//	}
-	//	logger.Info(data)
-	//}
+	ServerTree = <-serverTree
 
 }
 
@@ -160,27 +156,21 @@ func (h *Index) CloseVirtualServer(ctx *gin.Context) {
 		logger.Error(err)
 		return
 	}
-
-	idx := sort.Search(len(serverList), func(i int) bool {
-		return serverList[i].Port >= int32(ports)
-	})
-
-	if idx < len(serverList) && serverList[idx].Port == int32(ports) {
-
-		err := serverList[idx].Server.Stop()
-		if err != nil {
-			logger.Error(err)
-			ctx.JSON(http.StatusBadGateway, fmt.Sprintf("Server have problem with closed this actuality ports ?/|? %d", ports))
+	if server, found := ServerTree.Get(ports); found {
+		fmt.Printf("server type: %T ", server)
+		if server != nil {
+			fmt.Printf("Server found with port %d ", server.(mapHadler.ListServerSql).Port)
+			err := server.(mapHadler.ListServerSql).Server.Stop()
+			if err != nil {
+				ctx.JSON(http.StatusBadGateway, gin.H{"message": fmt.Sprintf("Server have problem with closed this actuality ports ?/|? %d", ports)})
+				logger.Error(err)
+				return
+			}
+			ctx.JSON(http.StatusAccepted, gin.H{"message": fmt.Sprintf("Server with port %d stoped", ports)})
 		}
-		ctx.JSON(http.StatusAccepted, fmt.Sprintf("Server with port %d stoped", ports))
 	} else {
-		ctx.JSON(http.StatusFound, fmt.Sprintf("Found noting: %d/%d", idx, ports))
+		ctx.JSON(http.StatusFound, gin.H{"message": fmt.Sprintf("Found noting: %d", ports)})
+		logger.Info("Server not found")
 	}
-	//for _, data := range serverList {
-	//	if data.Port == int32(ports) {
-	//
-	//	}
-	//}
 
-	//ctx.JSON(http.StatusOK, "ok")
 }

@@ -28,6 +28,8 @@ github.com/dolthub/go-mysql-server v0.14.0 h1:Igw9J19cVghGDqifP79TiFpRCawP3aK8O0
 github.com/dolthub/go-mysql-server v0.14.0/go.mod h1:KtpU4Sf7J+SIat/nxoA733QTn3tdL34NtoGxEBFcTsA=
 github.com/dolthub/vitess v0.0.0-20221031111135-9aad77e7b39f h1:2sNrQiE4pcdgCNp09RTOsmNeepgN5rL+ep8NF8Faw9U=
 github.com/dolthub/vitess v0.0.0-20221031111135-9aad77e7b39f/go.mod h1:oVFIBdqMFEkt4Xz2fzFJBNtzKhDEjwdCF0dzde39iKs=
+github.com/emirpasic/gods v1.18.1 h1:FXtiHYKDGKCW2KzwZKx0iC0PQmdlorYgdFG9jPXJ1Bc=
+github.com/emirpasic/gods v1.18.1/go.mod h1:8tpGGwCnJ5H4r6BWwaV6OrWmMoPhUl5jm/FMNAnJvWQ=
 github.com/envoyproxy/go-control-plane v0.9.0/go.mod h1:YTl/9mNaCwkRvm6d1a2C3ymFceY/DCBVvsKhRF0iEA4=
 github.com/envoyproxy/go-control-plane v0.9.1-0.20191026205805-5f8ba28d4473/go.mod h1:YTl/9mNaCwkRvm6d1a2C3ymFceY/DCBVvsKhRF0iEA4=
 github.com/envoyproxy/go-control-plane v0.9.4/go.mod h1:6rpuAdCZL397s3pYoYcLgu1mIlRU8Am5FuJP05cCM98=
