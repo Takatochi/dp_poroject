@@ -42,4 +42,18 @@ const startServer =async (serverMap)=>{
         name: serverMap.get(0).ServerName,
     })
 }
-export {listServer,getNewServer,initServer,deleteServer,startServer,stopServer}
+
+const sendFile = async (file)=>{
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+ return  await axios.post('/File/sql', formData)
+        // .then(response => {
+        //     console.log(response.data);
+        // })
+        // .catch(error => {
+        //     console.log(error);
+        // });
+}
+export {listServer,getNewServer,initServer,deleteServer,startServer,stopServer, sendFile}

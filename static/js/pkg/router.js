@@ -73,7 +73,7 @@ Router.prototype = {
                 setTimeout(()=>{
                     this.rootElem.innerHTML = response.data;
                     window.onloading=false;
-                 },1300)
+                 },700)
 
             })
     }

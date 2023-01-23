@@ -78,6 +78,11 @@ func configureRouter(h *handler.Handler, i *handler.Index) {
 		server.POST("/Start", i.StartVirtualServer)
 		server.DELETE("/Close/:port", i.CloseVirtualServer)
 	}
+	file := router.Group("/File")
+	{
+		file.POST("/sql", i.GetFileSqL)
+
+	}
 
 }
 func LogerDeager(param gin.LogFormatterParams) string {

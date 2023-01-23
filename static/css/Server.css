@@ -3,3 +3,12 @@ div> a{
     font-size: calc(1.25rem + .5vw);
     margin-left: 5px;
 }
+
+/*file loader input*/
+.file_loader .form-group{padding:1em;margin:1em}
+.file_loader input[type=file]{outline:0;opacity:0;pointer-events:none;user-select:none}
+.file_loader .label{width:120px;border:2px dashed #ce7d7d;border-radius:5px;display:block;padding:1.2em;transition:border 300ms ease;cursor:pointer;text-align:center}
+.file_loader .label i{display:block;font-size:42px;padding-bottom:16px}
+.file_loader .label i,.file_loader .label .title{color: #b74343;transition:200ms color}
+.file_loader .label:hover{border:2px solid #000}
+.file_loader .label:hover i,.file_loader .label:hover .title{color:#000}

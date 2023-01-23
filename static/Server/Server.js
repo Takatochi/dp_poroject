@@ -1,7 +1,7 @@
 "use strict";
 
 
-import {startServer} from "../js/datainterface/list.js";
+import {sendFile} from "../js/datainterface/list.js";
 import {play,stop} from "./active.js";
 
 (()=>{
@@ -38,7 +38,7 @@ const main = ()=>{
 
     play(serverData)
     stop(serverData.get(0).ServerPort)
-
+    infoLoader()
 
 }
 
@@ -47,4 +47,19 @@ const infoCart = (name,port) => {
     const servePort= document.getElementById("ServerPort");
     serveName.innerText=name;
     servePort.innerText=`:${port}`;
+}
+const infoLoader = ()=>{
+    let pastValue = document.querySelector(".js-value").innerHTML;
+    $('input[type="file"]').change(function(){
+        const file = document.getElementById('file-input').files[0];
+        let value = $("input[type='file']").val();
+        $('.js-value').text(value);
+        sendFile(file).then(e=>{
+            console.log(e)
+        }).finally(()=>{
+            setTimeout(()=>{
+                $('.js-value').text(pastValue);
+            },3000)
+        })
+    });
 }
