@@ -2,19 +2,27 @@ package main
 
 import (
 	"context"
-	"fmt"
-	"time"
+	"log"
+	"os"
+
+	"github.com/MagicalTux/goro/core/phpctx"
+	_ "github.com/MagicalTux/goro/ext/bz2"
+	_ "github.com/MagicalTux/goro/ext/ctype"
+	_ "github.com/MagicalTux/goro/ext/date"
+	_ "github.com/MagicalTux/goro/ext/gmp"
+	_ "github.com/MagicalTux/goro/ext/hash"
+	_ "github.com/MagicalTux/goro/ext/json"
+	_ "github.com/MagicalTux/goro/ext/pcre"
+	_ "github.com/MagicalTux/goro/ext/standard"
 )
 
 func main() {
-	// create a new context with a timeout of 1 second
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-	fmt.Println(ctx)
-
-	//create a new context with deadline of 1 second
-	deadline := time.Now().Add(5 * time.Second)
-	ctx, cancel = context.WithDeadline(context.Background(), deadline)
-	defer cancel()
-	fmt.Println(ctx)
+	// by default, run script test.php
+	p := phpctx.NewProcess("cli")
+	p.CommandLine(os.Args)
+	ctx := phpctx.NewGlobal(context.Background(), p)
+	if err := ctx.RunFile("test.php"); err != nil {
+		log.Printf("failed to run test file: %s", err)
+		os.Exit(1)
+	}
 }

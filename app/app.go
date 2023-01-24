@@ -74,6 +74,7 @@ func Run(config *server.Config, db Database.Database) {
 			logger.Error("failed to close server: %v", err)
 		}
 	}(database)
+
 	// init bd
 	var store *sqlBd.Store
 	store = sqlBd.New(database)

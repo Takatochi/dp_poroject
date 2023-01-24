@@ -38,7 +38,7 @@ const main = ()=>{
 
     play(serverData)
     stop(serverData.get(0).ServerPort)
-    infoLoader()
+    infoLoader(serverData.get(0).ServerPort)
 
 }
 
@@ -48,13 +48,13 @@ const infoCart = (name,port) => {
     serveName.innerText=name;
     servePort.innerText=`:${port}`;
 }
-const infoLoader = ()=>{
+const infoLoader = (port)=>{
     let pastValue = document.querySelector(".js-value").innerHTML;
     $('input[type="file"]').change(function(){
         const file = document.getElementById('file-input').files[0];
         let value = $("input[type='file']").val();
         $('.js-value').text(value);
-        sendFile(file).then(e=>{
+        sendFile(file,port).then(e=>{
             console.log(e)
         }).finally(()=>{
             setTimeout(()=>{

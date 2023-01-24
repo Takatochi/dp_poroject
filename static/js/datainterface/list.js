@@ -43,12 +43,13 @@ const startServer =async (serverMap)=>{
     })
 }
 
-const sendFile = async (file)=>{
+const sendFile = async (file,port)=>{
 
     const formData = new FormData();
     formData.append('file', file);
+    formData.append('port', port);
 
- return  await axios.post('/File/sql', formData)
+ return  await axios.post('/File/sql',formData)
         // .then(response => {
         //     console.log(response.data);
         // })

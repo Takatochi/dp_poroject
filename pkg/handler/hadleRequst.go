@@ -16,7 +16,7 @@ import (
 	"time"
 )
 
-var ServerTree *redblacktree.Tree
+var ServerTree redblacktree.Tree
 
 type ServerConfig struct {
 	Port int32  `json:"port"`
@@ -34,11 +34,11 @@ type Index struct {
 }
 
 func NewHandler(store StoreBD.Store) *Handler {
-	storeBD := &StoreBD.Listen{Store: store}
+	//storeBD := &StoreBD.Listen{Store: store}
 	return &Handler{
 		router: gin.New(),
 		store:  store,
-		stores: storeBD,
+		stores: store,
 	}
 
 }
@@ -66,7 +66,7 @@ func (h *Index) Index(ctx *gin.Context) {
 func (h *Index) New(ctx *gin.Context) {
 	//stores, err := h.Handler.stores.StoreBD().Server().Find()
 
-	store, err := h.Handler.stores.StoreBD().Server().Find()
+	store, err := h.Handler.stores.Server().Find()
 	if err != nil {
 		logger.Error(err)
 		return
@@ -139,15 +139,18 @@ func (h *Index) StartVirtualServer(ctx *gin.Context) {
 
 		defer wg.Done()
 		newTree, err := mapHadler.NewServerSql("localhost", stringFMT.StringTitleJoin(serverConfig.Name), serverConfig.Port)
-		errCh <- err
-
+		if err != nil {
+			errCh <- err
+			return
+		}
+		close(errCh)
 		h.mu.Lock()
-		ServerTree = newTree
+		ServerTree = *newTree
 		h.mu.Unlock()
 
 		ctx.JSON(http.StatusOK, gin.H{"message": fmt.Sprintf("Server with port %d start", serverConfig.Port)})
-		logger.Infof("Server with port %d already in use", serverConfig.Port)
-		close(errCh)
+		logger.Infof("Server with port %d start", serverConfig.Port)
+
 	}()
 	select {
 	case err := <-errCh:
@@ -168,10 +171,15 @@ func (h *Index) StartVirtualServer(ctx *gin.Context) {
 
 func (h *Index) CloseVirtualServer(ctx *gin.Context) {
 
-	port, err := h.getPortFromContext(ctx)
+	port, err := h.getPortFromContextPATH(ctx)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		logger.Errorf("Failed to get port from context %s", err.Error())
+		return
+	}
+	if ServerTree.Empty() {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "this server wasn't even started"})
+		logger.Errorf("this server wasn't even started tree is empty %d", port)
 		return
 	}
 	server, found := ServerTree.Get(port)
@@ -192,6 +200,7 @@ func (h *Index) CloseVirtualServer(ctx *gin.Context) {
 	// Use goroutine to run the server stop function concurrently
 	go func() {
 		errCh <- server.(mapHadler.ListServerSql).Server.Stop()
+
 	}()
 
 	select {
@@ -206,6 +215,7 @@ func (h *Index) CloseVirtualServer(ctx *gin.Context) {
 		logger.Error("Timeout while stopping the server")
 		return
 	}
+	ServerTree.Remove(port)
 
 	ctx.JSON(http.StatusAccepted, gin.H{"message": fmt.Sprintf("Server with port %d stopped", port)})
 }

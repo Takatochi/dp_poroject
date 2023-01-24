@@ -4,6 +4,7 @@ go 1.18
 
 require (
 	github.com/BurntSushi/toml v1.2.0
+	github.com/MagicalTux/goro v0.0.0-20181202174014-271b4c5c6b8d
 	github.com/dolthub/go-mysql-server v0.14.0
 	github.com/emirpasic/gods v1.18.1
 	github.com/gin-contrib/cors v1.4.0
@@ -15,10 +16,15 @@ require (
 )
 
 require (
+	github.com/KarpelesLab/strftime v0.1.3 // indirect
+	github.com/MagicalTux/strftime v0.1.3 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20200428143746-21a406dcc535 // indirect
+	github.com/cactus/gostrftime v1.0.2 // indirect
 	github.com/cespare/xxhash v1.1.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dolthub/vitess v0.0.0-20221031111135-9aad77e7b39f // indirect
+	github.com/fastly/go-utils v0.0.0-20180712184237-d95a45783239 // indirect
+	github.com/gijsbers/go-pcre v0.0.0-20161214203829-a84f3096ab3c // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/go-kit/kit v0.12.0 // indirect
 	github.com/go-playground/locales v0.14.0 // indirect
@@ -30,7 +36,9 @@ require (
 	github.com/google/flatbuffers v2.0.6+incompatible // indirect
 	github.com/google/uuid v1.2.0 // indirect
 	github.com/hashicorp/golang-lru v0.5.4 // indirect
+	github.com/jehiah/go-strftime v0.0.0-20171201141054-1d33003b3869 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
+	github.com/leekchan/timeutil v0.0.0-20150802142658-28917288c48d // indirect
 	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/lestrrat-go/strftime v1.0.4 // indirect
 	github.com/mattn/go-isatty v0.0.14 // indirect
@@ -43,6 +51,7 @@ require (
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/shopspring/decimal v1.2.0 // indirect
 	github.com/stretchr/testify v1.8.0 // indirect
+	github.com/tebeka/strftime v0.1.5 // indirect
 	github.com/ugorji/go/codec v1.2.7 // indirect
 	go.opentelemetry.io/otel v1.7.0 // indirect
 	go.opentelemetry.io/otel/trace v1.7.0 // indirect
