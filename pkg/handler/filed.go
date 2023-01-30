@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"database/sql"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"io"
@@ -12,6 +13,8 @@ import (
 	"project/pkg/handler/mapHadler"
 	"project/pkg/logger"
 )
+
+type tables string
 
 func (h *Index) GetFileSqL(ctx *gin.Context) {
 
@@ -52,14 +55,25 @@ func (h *Index) GetFileSqL(ctx *gin.Context) {
 		return
 	}
 
-	var bd *VirtualSql.VirtualMySQLDatabase
-	err = openVirtualSql(dir, bd, server.(mapHadler.ListServerSql).Config)
+	var store *VirtualSql.VirtualMySQLDatabase
+	bd, err := openVirtualSql(store, server.(mapHadler.ListServerSql).Config)
 	if err != nil {
 		ctx.String(http.StatusInternalServerError, fmt.Sprintf("problem with connect : %s", err.Error()))
 		return
 	}
-
-	ctx.String(http.StatusOK, "File uploaded successfully")
+	err = loaderDataSql(dir, bd)
+	if err != nil {
+		ctx.String(http.StatusInternalServerError, fmt.Sprintf("problem with saving : %s", err.Error()))
+		return
+	}
+	listTables, err := showTables(bd)
+	if err != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{"error": "server not found connect with bd"})
+		logger.Infof("server not found connect with bd %d", port)
+		return
+	}
+	fmt.Print(listTables)
+	ctx.JSON(http.StatusOK, gin.H{"message": listTables, "info": "File uploaded successfully"})
 }
 
 func saveFile(dir string, file multipart.File, header *multipart.FileHeader) (string, error) {
@@ -67,7 +81,7 @@ func saveFile(dir string, file multipart.File, header *multipart.FileHeader) (st
 	dir += header.Filename
 	f, err := os.Create(dir)
 	if err != nil {
-		return "nil", err
+		return "", err
 	}
 	defer f.Close()
 
@@ -77,19 +91,34 @@ func saveFile(dir string, file multipart.File, header *multipart.FileHeader) (st
 	return dir, nil
 }
 
-func openVirtualSql(dir string, db VirtualSql.Database, store *VirtualSql.ConfigVirtual) error {
-	//var store *VirtualSql.ConfigVirtual
-	//store = &VirtualSql.ConfigVirtual{
-	//	DatabaseURL: "",
-	//	DriverName:  "mysql",
-	//}
+func openVirtualSql(db VirtualSql.Database, store *VirtualSql.ConfigVirtual) (*sql.DB, error) {
+
 	DBStore, err := db.Open(store)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	err = mysqldump.Load(DBStore, dir)
+	return DBStore, nil
+}
+func loaderDataSql(dir string, db *sql.DB) error {
+	err := mysqldump.Load(db, dir)
 	if err != nil {
 		return err
 	}
 	return nil
+}
+func showTables(db *sql.DB) (*[]tables, error) {
+	rows, err := db.Query("SHOW TABLES")
+	if err != nil {
+		return nil, err
+	}
+
+	var tablesArr []tables
+	for rows.Next() {
+		var name tables
+		if err := rows.Scan(&name); err != nil {
+			return nil, err
+		}
+		tablesArr = append(tablesArr, name)
+	}
+	return &tablesArr, nil
 }

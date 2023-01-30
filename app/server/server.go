@@ -70,6 +70,7 @@ func configureRouter(h *handler.Handler, i *handler.Index) {
 	{
 		data.GET("/", i.Index)
 		data.POST("/New", i.New)
+
 	}
 	server := router.Group("/Server")
 	{
