@@ -78,6 +78,8 @@ func configureRouter(h *handler.Handler, i *handler.Index) {
 		server.DELETE("/delete/server/:id", i.DeleteSever)
 		server.POST("/Start", i.StartVirtualServer)
 		server.DELETE("/Close/:port", i.CloseVirtualServer)
+		server.GET("/Show/:port", i.GetTableWITHPort)
+
 	}
 	file := router.Group("/File")
 	{

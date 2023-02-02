@@ -122,3 +122,101 @@ func showTables(db *sql.DB) (*[]tables, error) {
 	}
 	return &tablesArr, nil
 }
+
+func (h *Index) GetTableWITHPort(ctx *gin.Context) {
+
+	port, err := h.getPortFromContextPATH(ctx)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		logger.Errorf("Failed to get port from %s", err.Error())
+		return
+	}
+	if ServerTree.Empty() {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "server tree is empty"})
+		logger.Errorf("server tree is empty %d", port)
+		return
+	}
+
+	server, found := ServerTree.Get(port)
+	if server == nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "server is nil"})
+		logger.Errorf("server is nil %d", port)
+		return
+	}
+	if !found {
+		ctx.JSON(http.StatusNotFound, gin.H{"error": "server not found"})
+		logger.Infof("Server not found port %d", port)
+		return
+	}
+	var store *VirtualSql.VirtualMySQLDatabase
+
+	bd, err := openVirtualSql(store, server.(mapHadler.ListServerSql).Config)
+	if err != nil {
+		ctx.String(http.StatusInternalServerError, fmt.Sprintf("problem with connect : %s", err.Error()))
+		return
+	}
+
+	listTables, err := showTables(bd)
+	if err != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{"error": "server not found connect with bd"})
+		logger.Infof("server not found connect with bd %d", port)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"data": listTables, "info": "File uploaded successfully"})
+
+}
+
+//func (h *Index) f() {
+//	rows, err := db.Query("SHOW TABLES")
+//	if err != nil {
+//		fmt.Println(err)
+//		return
+//	}
+//	defer rows.Close()
+//
+//	var tableName string
+//	for rows.Next() {
+//		if err := rows.Scan(&tableName); err != nil {
+//			fmt.Println(err)
+//			return
+//		}
+//
+//		// Retrieve all data from each table
+//		tableRows, err := db.Query("SELECT * FROM " + tableName)
+//		if err != nil {
+//			fmt.Println(err)
+//			return
+//		}
+//		defer tableRows.Close()
+//
+//		// Print the data from each table
+//		fmt.Println("Data from table:", tableName)
+//		for tableRows.Next() {
+//			var columns []interface{}
+//			var columnPointers []interface{}
+//
+//			// Create a slice of pointers to the columns
+//			columns, err = tableRows.Columns()
+//			if err != nil {
+//				fmt.Println(err)
+//				return
+//			}
+//			for i := range columns {
+//				columnPointers = append(columnPointers, new(interface{}))
+//			}
+//
+//			// Scan the columns into the slice of pointers
+//			if err := tableRows.Scan(columnPointers...); err != nil {
+//				fmt.Println(err)
+//				return
+//			}
+//
+//			// Print the column values
+//			fmt.Println(columns)
+//			for i, column := range columns {
+//				fmt.Println(column, *columnPointers[i].(*interface{}))
+//			}
+//		}
+//	}
+//}
