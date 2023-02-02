@@ -72,8 +72,8 @@ func (h *Index) GetFileSqL(ctx *gin.Context) {
 		logger.Infof("server not found connect with bd %d", port)
 		return
 	}
-	fmt.Print(listTables)
-	ctx.JSON(http.StatusOK, gin.H{"message": listTables, "info": "File uploaded successfully"})
+
+	ctx.JSON(http.StatusOK, gin.H{"data": listTables, "info": "File uploaded successfully"})
 }
 
 func saveFile(dir string, file multipart.File, header *multipart.FileHeader) (string, error) {

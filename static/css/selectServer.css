@@ -4,3 +4,24 @@
     margin: 10px 10px 10px 10px;
 
 }
+:root{
+
+}
+.list-group{
+    padding: 2rem;
+}
+.list-group-item{
+    margin: 0px 0px 5px 0px;
+    box-shadow: 5px 5px 4px #cecdcd;
+
+}
+#list-group{
+    --bs-list-group-active-border-color: white;
+    --bs-list-group-active-bg: var(--bs-link-color-icon);
+    --bs-list-group-action-hover-bg: none;
+    --bs-list-group-border-width:none;
+
+}
+#list-group > .active {
+    box-shadow: 10px 5px 5px #421414;
+}

@@ -1,7 +1,7 @@
 "use strict";
 
 
-import {sendFile} from "../js/datainterface/list.js";
+import {sendFile, ServerActivity} from "../js/datainterface/list.js";
 import {play,stop} from "./active.js";
 
 (()=>{
@@ -12,7 +12,7 @@ import {play,stop} from "./active.js";
                 if (location.ServerData === undefined)
                 {
                     location.href = "/#"
-                    return 0
+                    return ;
                 }
                 main()
             }
@@ -22,6 +22,7 @@ import {play,stop} from "./active.js";
 
 
 const main = ()=>{
+
     const serverData= new Map(
         [
             [
@@ -37,8 +38,11 @@ const main = ()=>{
     infoCart(serverData.get(0).ServerName,serverData.get(0).ServerPort);
 
     play(serverData)
-    stop(serverData.get(0).ServerPort)
+    stop(serverData)
     infoLoader(serverData.get(0).ServerPort)
+
+    styleUse(serverData)
+
 
 }
 
@@ -62,4 +66,11 @@ const infoLoader = (port)=>{
             },3000)
         })
     });
+}
+
+const styleUse =(serverData)=>{
+    const loader =document.querySelector('.file_loader')
+    if (ServerActivity.has(serverData.get(0).ServerName)){
+        loader.style.display='block';
+    }
 }

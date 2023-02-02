@@ -10,7 +10,6 @@ import (
 	"project/pkg/logger"
 	"project/pkg/port"
 	StoreBD "project/pkg/store"
-	"project/pkg/stringFMT"
 	"strconv"
 	"sync"
 	"time"
@@ -68,11 +67,23 @@ func (h *Index) New(ctx *gin.Context) {
 
 	store, err := h.Handler.stores.Server().Find()
 	if err != nil {
+		ctx.JSON(http.StatusNotExtended, err)
 		logger.Error(err)
 		return
 	}
+	var listServerData []string
+	if !ServerTree.Empty() {
+		serverData := ServerTree.Values()
+		//fmt.Print(serverData[0].(mapHadler.ListServerSql).Name)
+		for _, name := range serverData {
+			listServerData = append(listServerData, name.(mapHadler.ListServerSql).Name)
+		}
+	}
 
-	ctx.JSON(http.StatusOK, store)
+	ctx.JSON(http.StatusOK, gin.H{
+		"st":             store,
+		"serverActivity": listServerData,
+	})
 
 }
 
@@ -138,7 +149,7 @@ func (h *Index) StartVirtualServer(ctx *gin.Context) {
 	go func() {
 
 		defer wg.Done()
-		newTree, err := mapHadler.NewServerSql("localhost", stringFMT.StringTitleJoin(serverConfig.Name), serverConfig.Port)
+		newTree, err := mapHadler.NewServerSql("localhost", serverConfig.Name, serverConfig.Port)
 		if err != nil {
 			errCh <- err
 			return

@@ -30,12 +30,15 @@ dd {
 }
 #barmenu{
   --bs-nav-pills-link-active-bg:var(--bs-nav-bar-menu);
-  --bs-link-color:var(--bs-link-color-icon)
+  --bs-link-color:var(--bs-link-color-icon);
+  --bs-nav-link-hover-color: var(--hover-bar-link);
 }
 :root{
-  --bs-nav-bar-menu: #6c757d;
-  --bs-link-color-icon:red;
-  --body-bg:#a6a6a6;
+  --bs-nav-bar-menu: #000;
+  --bs-link-color-icon:#000;
+  --body-bg:#E6EBE6;
+  --hover-bar-link : #c50000;
+
 }
 /* Выставляем основные настройки по-умолчанию для body */
 html{

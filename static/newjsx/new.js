@@ -19,7 +19,7 @@ const load=()=>{
 })()
 
 function LoadNews(){
-    console.log(" 13")
+
     const app=document.getElementById("app")
 
     app.addEventListener('appDom',(e)=>{

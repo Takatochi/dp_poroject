@@ -11,6 +11,7 @@ import (
 	"project/pkg/Database/VirtualSql"
 	"project/pkg/MYSQLserver"
 	"project/pkg/logger"
+	"project/pkg/stringFMT"
 	"time"
 )
 
@@ -20,6 +21,7 @@ const (
 
 type ListServerSql struct {
 	Port   int32
+	Name   string
 	Server *MYSQLserver.MySqli
 	Config *VirtualSql.ConfigVirtual
 }
@@ -42,7 +44,8 @@ func NewServerSql(address, dbname string, port int32) (*redblacktree.Tree, error
 		Address:  fmt.Sprintf("%s:%d", address, port),
 		Version:  Version,
 	}
-	db := memory.NewDatabase(dbname)
+	nameDB := stringFMT.StringTitleJoin(dbname)
+	db := memory.NewDatabase(nameDB)
 	analyzer := analyzer.NewDefault(analyzer.NewDatabaseProvider(db, information_schema.NewInformationSchemaDatabase()))
 
 	srv := MYSQLserver.NewMySqliDefault(cfg, analyzer, config)
@@ -60,8 +63,8 @@ func NewServerSql(address, dbname string, port int32) (*redblacktree.Tree, error
 	}()
 
 	//listServerSql = append(listServerSql, ListServerSql{Port: port, Server: srv})
-	serverTree.Put(int(port), ListServerSql{Port: port, Server: srv, Config: &VirtualSql.ConfigVirtual{
-		DatabaseURL: fmt.Sprintf("root:root@tcp(127.0.0.1:%d)/%s", port, dbname),
+	serverTree.Put(int(port), ListServerSql{Port: port, Name: dbname, Server: srv, Config: &VirtualSql.ConfigVirtual{
+		DatabaseURL: fmt.Sprintf("root:root@tcp(127.0.0.1:%d)/%s", port, nameDB),
 		DriverName:  "mysql",
 	}})
 

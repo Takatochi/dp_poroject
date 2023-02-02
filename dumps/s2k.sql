@@ -15,13 +15,13 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `server`
+-- Table structure for table `server2`
 --
 
-DROP TABLE IF EXISTS `server`;
+DROP TABLE IF EXISTS `server2`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
  SET character_set_client = utf8mb4 ;
-CREATE TABLE `server` (
+CREATE TABLE `server2` (
   `Id` int NOT NULL AUTO_INCREMENT,
   `name` varchar(30) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
   `port` int NOT NULL,
@@ -30,13 +30,13 @@ CREATE TABLE `server` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `server`
+-- Dumping data for table `server2`
 --
 
-LOCK TABLES `server` WRITE;
-/*!40000 ALTER TABLE `server` DISABLE KEYS */;
+LOCK TABLES `server2` WRITE;
+/*!40000 ALTER TABLE `server2` DISABLE KEYS */;
 INSERT INTO `server` (`Id`, `name`, `port`) VALUES (2,'Load data science',8678),(3,'s',5634),(4,'ss3',2342);
-/*!40000 ALTER TABLE `server` ENABLE KEYS */;
+/*!40000 ALTER TABLE `server2` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
