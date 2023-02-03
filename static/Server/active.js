@@ -47,7 +47,7 @@ const stop=(dataMap)=>{
         stopServer(dataMap.get(0).ServerPort).then(
             data => {
                 appendAlert(data.data.message,"success")
-                loader.style.display='block';
+                loader.style.display='none';
             }
         ).catch(error=>{
             appendAlert(error.response.data.error,"warning")
