@@ -12,6 +12,7 @@ import (
 	mysqldump "project/pkg/Database/dumpmysql"
 	"project/pkg/handler/mapHadler"
 	"project/pkg/logger"
+	"project/pkg/model"
 )
 
 type tables string
@@ -106,7 +107,7 @@ func loaderDataSql(dir string, db *sql.DB) error {
 	}
 	return nil
 }
-func showTables(db *sql.DB) (*[]tables, error) {
+func showTables(db *sql.DB) ([]tables, error) {
 	rows, err := db.Query("SHOW TABLES")
 	if err != nil {
 		return nil, err
@@ -120,7 +121,7 @@ func showTables(db *sql.DB) (*[]tables, error) {
 		}
 		tablesArr = append(tablesArr, name)
 	}
-	return &tablesArr, nil
+	return tablesArr, nil
 }
 
 func (h *Index) GetTableWITHPort(ctx *gin.Context) {
@@ -148,6 +149,7 @@ func (h *Index) GetTableWITHPort(ctx *gin.Context) {
 		logger.Infof("Server not found port %d", port)
 		return
 	}
+
 	var store *VirtualSql.VirtualMySQLDatabase
 
 	bd, err := openVirtualSql(store, server.(mapHadler.ListServerSql).Config)
@@ -155,7 +157,10 @@ func (h *Index) GetTableWITHPort(ctx *gin.Context) {
 		ctx.String(http.StatusInternalServerError, fmt.Sprintf("problem with connect : %s", err.Error()))
 		return
 	}
-
+	allTables, err := retrieveAllDataFromAllTables(bd)
+	if err != nil {
+		return
+	}
 	listTables, err := showTables(bd)
 	if err != nil {
 		ctx.JSON(http.StatusNotFound, gin.H{"error": "server not found connect with bd"})
@@ -163,60 +168,71 @@ func (h *Index) GetTableWITHPort(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"data": listTables, "info": "File uploaded successfully"})
+	ctx.JSON(http.StatusOK, gin.H{"data": listTables, "info": "File uploaded successfully", "list": allTables})
 
 }
 
-//func (h *Index) f() {
-//	rows, err := db.Query("SHOW TABLES")
-//	if err != nil {
-//		fmt.Println(err)
-//		return
-//	}
-//	defer rows.Close()
-//
-//	var tableName string
-//	for rows.Next() {
-//		if err := rows.Scan(&tableName); err != nil {
-//			fmt.Println(err)
-//			return
-//		}
-//
-//		// Retrieve all data from each table
-//		tableRows, err := db.Query("SELECT * FROM " + tableName)
-//		if err != nil {
-//			fmt.Println(err)
-//			return
-//		}
-//		defer tableRows.Close()
-//
-//		// Print the data from each table
-//		fmt.Println("Data from table:", tableName)
-//		for tableRows.Next() {
-//			var columns []interface{}
-//			var columnPointers []interface{}
-//
-//			// Create a slice of pointers to the columns
-//			columns, err = tableRows.Columns()
-//			if err != nil {
-//				fmt.Println(err)
-//				return
-//			}
-//			for i := range columns {
-//				columnPointers = append(columnPointers, new(interface{}))
-//			}
-//
-//			// Scan the columns into the slice of pointers
-//			if err := tableRows.Scan(columnPointers...); err != nil {
-//				fmt.Println(err)
-//				return
-//			}
-//
-//			// Print the column values
-//			fmt.Println(columns)
-//			for i, column := range columns {
-//				fmt.Println(column, *columnPointers[i].(*interface{}))
-//			}
-//		}
-//	}
-//}
+func retrieveAllDataFromAllTables(db *sql.DB) ([]model.DataModelTables, error) {
+	tableName, err := showTables(db)
+	if err != nil {
+		return nil, err
+	}
+	var DataModelTablesList []model.DataModelTables
+	//&model.Server{}
+	var DataModelTables model.DataModelTables
+	for index, element := range tableName {
+
+		fmt.Print(index, element)
+		//	// Retrieve all data from each table
+		tableRows, err := db.Query("SELECT * FROM " + string(element))
+		if err != nil {
+			return nil, err
+		}
+		defer tableRows.Close()
+		//	// Print the data from each table
+		fmt.Println("Data from table:", element)
+		DataModelTables.TableName = string(element)
+		for tableRows.Next() {
+			var columns []string
+			var columnPointers []interface{}
+
+			// Create a slice of pointers to the columns
+			columns, err = tableRows.Columns()
+			if err != nil {
+
+				return nil, err
+			}
+			for range columns {
+				columnPointers = append(columnPointers, new(string))
+			}
+
+			// Scan the columns into the slice of pointers
+			if err := tableRows.Scan(columnPointers...); err != nil {
+				fmt.Println(err)
+				return nil, err
+			}
+
+			// Print the column values
+			//fmt.Println(columns)
+			var data []model.Internal
+			var сolumnsBL = make(map[string]interface{})
+			for i, column := range columns {
+				сolumnsBL[column] = *columnPointers[i].(*string)
+				//data = append(data, *columnPointers[i].(*string))
+				//fmt.Println(column, *columnPointers[i].(*string))
+
+			}
+			data = append(data, model.Internal{ID: 0, Columns: сolumnsBL})
+			DataModelTables.Internal = data
+			//data = append(data, model.Internal{ID: i, Columns: map[string]interface{}{column}})
+			// end
+
+		}
+		DataModelTablesList = append(DataModelTablesList, DataModelTables)
+	}
+	fmt.Println(DataModelTablesList)
+	for _, d := range DataModelTablesList {
+		fmt.Println(d.Internal)
+	}
+	return DataModelTablesList, nil
+}
