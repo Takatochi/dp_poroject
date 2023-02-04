@@ -159,16 +159,18 @@ func (h *Index) GetTableWITHPort(ctx *gin.Context) {
 	}
 	allTables, err := retrieveAllDataFromAllTables(bd)
 	if err != nil {
-		return
-	}
-	listTables, err := showTables(bd)
-	if err != nil {
-		ctx.JSON(http.StatusNotFound, gin.H{"error": "server not found connect with bd"})
+		ctx.JSON(http.StatusConflict, gin.H{"error": "server not found connect with bd"})
 		logger.Infof("server not found connect with bd %d", port)
 		return
 	}
+	//listTables, err := showTables(bd)
+	//if err != nil {
+	//	ctx.JSON(http.StatusNotFound, gin.H{"error": "server not found connect with bd"})
+	//	logger.Infof("server not found connect with bd %d", port)
+	//	return
+	//}
 
-	ctx.JSON(http.StatusOK, gin.H{"data": listTables, "info": "File uploaded successfully", "list": allTables})
+	ctx.JSON(http.StatusOK, gin.H{"info": "File uploaded successfully", "list": allTables})
 
 }
 
@@ -178,32 +180,47 @@ func retrieveAllDataFromAllTables(db *sql.DB) ([]model.DataModelTables, error) {
 		return nil, err
 	}
 	var DataModelTablesList []model.DataModelTables
-	//&model.Server{}
 	var DataModelTables model.DataModelTables
-	for index, element := range tableName {
-
-		fmt.Print(index, element)
-		//	// Retrieve all data from each table
+	for _, element := range tableName {
 		tableRows, err := db.Query("SELECT * FROM " + string(element))
 		if err != nil {
 			return nil, err
 		}
 		defer tableRows.Close()
-		//	// Print the data from each table
-		fmt.Println("Data from table:", element)
+
 		DataModelTables.TableName = string(element)
 		for tableRows.Next() {
 			var columns []string
 			var columnPointers []interface{}
 
-			// Create a slice of pointers to the columns
 			columns, err = tableRows.Columns()
 			if err != nil {
-
 				return nil, err
 			}
-			for range columns {
-				columnPointers = append(columnPointers, new(string))
+
+			// Get column types
+			columnTypes, err := tableRows.ColumnTypes()
+			if err != nil {
+				return nil, err
+			}
+
+			// Create a slice of pointers to the columns based on their type
+			for i := range columns {
+				switch columnTypes[i].DatabaseTypeName() {
+				case "BLOB":
+					columnPointers = append(columnPointers, new([]byte))
+				case "INT", "TINYINT", "SMALLINT", "MEDIUMINT", "BIGINT":
+					var in sql.NullInt64
+					columnPointers = append(columnPointers, &in)
+				case "FLOAT", "DOUBLE", "DECIMAL":
+					var f sql.NullFloat64
+					columnPointers = append(columnPointers, &f)
+				case "CHAR", "VARCHAR", "TINYTEXT", "TEXT", "MEDIUMTEXT", "LONGTEXT":
+					var s sql.NullString
+					columnPointers = append(columnPointers, &s)
+				default:
+					columnPointers = append(columnPointers, new(string))
+				}
 			}
 
 			// Scan the columns into the slice of pointers
@@ -212,27 +229,28 @@ func retrieveAllDataFromAllTables(db *sql.DB) ([]model.DataModelTables, error) {
 				return nil, err
 			}
 
-			// Print the column values
-			//fmt.Println(columns)
 			var data []model.Internal
 			var сolumnsBL = make(map[string]interface{})
 			for i, column := range columns {
-				сolumnsBL[column] = *columnPointers[i].(*string)
-				//data = append(data, *columnPointers[i].(*string))
-				//fmt.Println(column, *columnPointers[i].(*string))
-
+				switch columnTypes[i].DatabaseTypeName() {
+				case "BLOB":
+					сolumnsBL[column] = *columnPointers[i].(*[]byte)
+				case "INT", "TINYINT", "SMALLINT", "MEDIUMINT", "BIGINT":
+					сolumnsBL[column] = columnPointers[i].(*sql.NullInt64).Int64
+				case "FLOAT", "DOUBLE", "DECIMAL":
+					сolumnsBL[column] = columnPointers[i].(*sql.NullFloat64).Float64
+				case "CHAR", "VARCHAR", "TINYTEXT", "TEXT", "MEDIUMTEXT", "LONGTEXT":
+					сolumnsBL[column] = columnPointers[i].(*sql.NullString).String
+				default:
+					сolumnsBL[column] = *columnPointers[i].(*string)
+				}
+				data = append(data, model.Internal{ID: i, Columns: сolumnsBL})
 			}
-			data = append(data, model.Internal{ID: 0, Columns: сolumnsBL})
-			DataModelTables.Internal = data
-			//data = append(data, model.Internal{ID: i, Columns: map[string]interface{}{column}})
-			// end
 
+			DataModelTables.Internal = data
 		}
 		DataModelTablesList = append(DataModelTablesList, DataModelTables)
 	}
-	fmt.Println(DataModelTablesList)
-	for _, d := range DataModelTablesList {
-		fmt.Println(d.Internal)
-	}
+
 	return DataModelTablesList, nil
 }
