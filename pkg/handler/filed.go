@@ -169,8 +169,11 @@ func (h *Index) GetTableWITHPort(ctx *gin.Context) {
 	//	logger.Infof("server not found connect with bd %d", port)
 	//	return
 	//}
-
-	ctx.JSON(http.StatusOK, gin.H{"info": "File uploaded successfully", "list": allTables})
+	typeTables, err := retrieveVarTypeTables(bd)
+	if err != nil {
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{"info": "File uploaded successfully", "type": typeTables, "data": allTables})
 
 }
 
@@ -186,7 +189,6 @@ func retrieveAllDataFromAllTables(db *sql.DB) ([]model.DataModelTables, error) {
 		if err != nil {
 			return nil, err
 		}
-		defer tableRows.Close()
 
 		DataModelTables.TableName = string(element)
 		for tableRows.Next() {
@@ -225,7 +227,6 @@ func retrieveAllDataFromAllTables(db *sql.DB) ([]model.DataModelTables, error) {
 
 			// Scan the columns into the slice of pointers
 			if err := tableRows.Scan(columnPointers...); err != nil {
-				fmt.Println(err)
 				return nil, err
 			}
 
@@ -250,7 +251,55 @@ func retrieveAllDataFromAllTables(db *sql.DB) ([]model.DataModelTables, error) {
 			DataModelTables.Internal = data
 		}
 		DataModelTablesList = append(DataModelTablesList, DataModelTables)
+		err = tableRows.Close()
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return DataModelTablesList, nil
+}
+
+func retrieveVarTypeTables(db *sql.DB) (*model.DataModelTypeTables, error) {
+	tableName, err := showTables(db)
+	if err != nil {
+		return nil, err
+	}
+
+	var DataModelTypeTables model.DataModelTypeTables
+	var сolumnsBL = make(map[string]interface{})
+	for _, element := range tableName {
+		tableRows, err := db.Query("SELECT * FROM " + string(element))
+		if err != nil {
+			return nil, err
+		}
+
+		DataModelTypeTables.TableName = string(element)
+		for tableRows.Next() {
+			var columns []string
+			columns, err = tableRows.Columns()
+			if err != nil {
+				return nil, err
+			}
+
+			// Get column types
+			columnTypes, err := tableRows.ColumnTypes()
+			if err != nil {
+				return nil, err
+			}
+
+			for i, column := range columns {
+				сolumnsBL[column] = columnTypes[i].DatabaseTypeName()
+
+			}
+
+		}
+		err = tableRows.Close()
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	DataModelTypeTables.Var = model.Internal{ID: -1, Columns: сolumnsBL}
+	return &DataModelTypeTables, nil
 }
