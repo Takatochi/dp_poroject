@@ -1,5 +1,57 @@
-import {ServerActivity, startServer, stopServer} from "../js/datainterface/list.js";
+import {ServerActivity, shower, startServer, stopServer} from "../js/datainterface/list.js";
 
+
+const appendTable = async (port)=>{
+
+
+    const VarType =[]
+    await shower(port).then(data=>{
+        VarType.push(...data.data.type)
+    })
+
+    // let Naming
+    // let SourceType
+    // for (const property in typesVar) {
+    //      console.log(`${property}: ${typesVar[property]}`);
+    //     Naming+=`<th>${property}</th>`
+    //     SourceType+=`<th>${typesVar[property]}</th>`
+    // }
+    //
+
+    VarType.map(typesVar=>{
+
+        const alertPlaceholder = document.querySelector('.table-responsive')
+        const wrapper = document.createElement('div')
+        let Naming=[]
+        let SourceType=[]
+        for (const property in typesVar.var.Columns) {
+            console.log(`${property}: ${typesVar.var.Columns[property]}`);
+            Naming+=`<th>${property}</th>`
+            SourceType+=`<td>${typesVar.var.Columns[property]}</td>`
+
+        }
+        wrapper.innerHTML = [
+            `<p>${typesVar.tableName}</p>`,
+            `<table class="table">`,
+            `<thead>`,
+            `<tr>`,
+            `<th>#</th>`,
+             Naming,
+            `</tr>`,
+            `</thead>`,
+            `<tbody>`,
+            `<tr>`,
+            `<th scope="row">1</th>`,
+            SourceType,
+            `</tr>`,
+            `</tbody>`,
+            ` </table>`,
+        ].join('')
+
+        alertPlaceholder.append(wrapper)
+    })
+
+}
 
 const appendAlert = (message, type) => {
     const alertPlaceholder = document.getElementById('Server')
@@ -15,7 +67,7 @@ const appendAlert = (message, type) => {
 
     alertPlaceholder.append(wrapper)
 }
-const play=(dataMap)=>{
+const play=  (dataMap)=>{
 
     const loader =document.querySelector('.file_loader'),
     idPlay= document.getElementById('play'),
@@ -33,6 +85,7 @@ const play=(dataMap)=>{
             appendAlert(error.response.data.error,"danger")
         }).finally(_=>{
             ServerActivity.set(`${dataMap.get(0).ServerName}`,true)
+
             // disabled.
         })
     })
@@ -58,4 +111,4 @@ const stop=(dataMap)=>{
 
 
 }
-export {play,stop}
+export {play,stop,appendTable}

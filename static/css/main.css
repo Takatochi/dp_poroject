@@ -95,8 +95,8 @@ main{
   height: -webkit-fill-available;
   height: 100vh;
   max-height: 100vh;
-  overflow-x: auto;
-  overflow-y: hidden;
+  /*overflow-x: auto;*/
+  /*overflow-y: hidden;*/
 }
 .bd-placeholder-img {
   font-size: 1.125rem;

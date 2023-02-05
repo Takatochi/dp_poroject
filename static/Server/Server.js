@@ -2,7 +2,7 @@
 
 
 import {sendFile, ServerActivity} from "../js/datainterface/list.js";
-import {play,stop} from "./active.js";
+import {appendTable, play, stop} from "./active.js";
 
 (()=>{
     const app=document.getElementById("app");
@@ -64,6 +64,7 @@ const infoLoader = (port)=>{
             setTimeout(()=>{
                 $('.js-value').text(pastValue);
             },3000)
+            appendTable(port)
         })
     });
 }

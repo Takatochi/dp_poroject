@@ -59,11 +59,9 @@ const sendFile = async (file,port)=>{
     formData.append('port', port);
 
  return  await axios.post('/File/sql',formData)
-        // .then(response => {
-        //     console.log(response.data);
-        // })
-        // .catch(error => {
-        //     console.log(error);
-        // });
+
 }
-export {listServer,getNewServer,initServer,deleteServer,startServer,stopServer, sendFile,ServerActivity}
+
+const shower = (port)=>{return axios.get(`/Server/Show/${port}`)}
+
+export {listServer,getNewServer,initServer,deleteServer,startServer,stopServer, sendFile,shower,ServerActivity}

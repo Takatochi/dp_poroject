@@ -43,6 +43,28 @@ INSERT INTO `test` (`id`, `mn`, `mn2`, `mn3`) VALUES
 (0, '10.30', 32, '545');
 COMMIT;
 
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `category`
+--
+
+CREATE TABLE `category` (
+  `Id` int NOT NULL,
+  `naming` varchar(30) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+  `categoryId` int NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+
+--
+-- Дамп данных таблицы `category`
+--
+
+INSERT INTO `category` (`Id`, `naming`, `categoryId`) VALUES
+(1, 'hoodie', 1),
+(2, 'Tshirt', 2),
+(3, 'Штани', 8),
+(4, 'світер', 5);
+
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
