@@ -53,7 +53,7 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func (h *Index) Index(ctx *gin.Context) {
 
 	ctx.Request.ParseForm()
-
+	h.Handler.createGETServer("/st", "/data", h.Handler.test)
 	get := ctx.Request.Form
 	ctx.HTML(http.StatusOK, "index", gin.H{
 		"Rget": get,

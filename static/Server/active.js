@@ -1,58 +1,6 @@
 import {ServerActivity, shower, startServer, stopServer} from "../js/datainterface/list.js";
 
 
-const appendTable = async (port)=>{
-
-
-    const VarType =[]
-    await shower(port).then(data=>{
-        VarType.push(...data.data.type)
-    })
-
-    // let Naming
-    // let SourceType
-    // for (const property in typesVar) {
-    //      console.log(`${property}: ${typesVar[property]}`);
-    //     Naming+=`<th>${property}</th>`
-    //     SourceType+=`<th>${typesVar[property]}</th>`
-    // }
-    //
-
-    VarType.map(typesVar=>{
-
-        const alertPlaceholder = document.querySelector('.table-responsive')
-        const wrapper = document.createElement('div')
-        let Naming=[]
-        let SourceType=[]
-        for (const property in typesVar.var.Columns) {
-            console.log(`${property}: ${typesVar.var.Columns[property]}`);
-            Naming+=`<th>${property}</th>`
-            SourceType+=`<td>${typesVar.var.Columns[property]}</td>`
-
-        }
-        wrapper.innerHTML = [
-            `<p>${typesVar.tableName}</p>`,
-            `<table class="table">`,
-            `<thead>`,
-            `<tr>`,
-            `<th>#</th>`,
-             Naming,
-            `</tr>`,
-            `</thead>`,
-            `<tbody>`,
-            `<tr>`,
-            `<th scope="row">1</th>`,
-            SourceType,
-            `</tr>`,
-            `</tbody>`,
-            ` </table>`,
-        ].join('')
-
-        alertPlaceholder.append(wrapper)
-    })
-
-}
-
 const appendAlert = (message, type) => {
     const alertPlaceholder = document.getElementById('Server')
     const wrapper = document.createElement('div')
@@ -67,6 +15,71 @@ const appendAlert = (message, type) => {
 
     alertPlaceholder.append(wrapper)
 }
+
+const appendTable = async (port)=>{
+
+
+    const VarType =[]
+    await shower(port).then(data=>{
+        if (data.data.type != null) {
+            VarType.push(...data.data.type)
+            return;
+        }
+
+    }).catch(error=>{
+        appendAlert(error.response.data.error,"warning")
+    })
+
+    if (VarType.length<0) return;
+
+    VarType.map((typesVar,index)=>{
+
+        const alertPlaceholder = document.getElementById('accordionFlushType')
+        const wrapper = document.createElement('div')
+        let Naming=[]
+        let SourceType=[]
+        for (const property in typesVar.var.Columns) {
+            console.log(`${property}: ${typesVar.var.Columns[property]}`);
+            Naming+=`<th>${property}</th>`
+            SourceType+=`<td>${typesVar.var.Columns[property]}</td>`
+
+        }
+        wrapper.innerHTML = [
+           ` <div class="accordion-item">`,
+                `<h2 class="accordion-header" id="flush-heading${index}">`,
+                   `<button id="collapsed_btn"class="accordion-button collapsed" type="button" data-bs-toggle="collapse",
+                            data-bs-target="#flush-collapse${index}" aria-expanded="false" aria-controls="flush-collapse${index}">`,
+                        `${typesVar.tableName}`,
+                    `</button>`,
+                `</h2>`,
+            `<div id="flush-collapse${index}" class="accordion-collapse collapse" aria-labelledby="flush-heading${index}"
+                     data-bs-parent="#accordionFlushType">`,
+            `<div class="table-responsive">`,
+            `<table class="table">`,
+            `<thead>`,
+            `<tr>`,
+            `<th>#</th>`,
+             Naming,
+            `</tr>`,
+            `</thead>`,
+            `<tbody>`,
+            `<tr>`,
+            `<th scope="row">1</th>`,
+            SourceType,
+            `</tr>`,
+            `</tbody>`,
+            ` </table>`,
+            `</div>`,
+            `</div>`,
+            `</div>`,
+        ].join('')
+
+        alertPlaceholder.append(wrapper)
+    })
+
+}
+
+
 const play=  (dataMap)=>{
 
     const loader =document.querySelector('.file_loader'),

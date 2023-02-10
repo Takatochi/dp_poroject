@@ -7,11 +7,11 @@ import (
 )
 
 type Server struct {
-	httpServer *http.Server
+	httpServer http.Server
 }
 
 func (s Server) HTTPServer(port string, router *gin.Engine) (http.Server, error) {
-	s.httpServer = &http.Server{
+	s.httpServer = http.Server{
 		Addr:           ":" + port,
 		MaxHeaderBytes: 1 << 20,
 		Handler:        router,
@@ -19,5 +19,5 @@ func (s Server) HTTPServer(port string, router *gin.Engine) (http.Server, error)
 		WriteTimeout:   10 * time.Second,
 	}
 
-	return *s.httpServer, s.httpServer.ListenAndServe()
+	return s.httpServer, s.httpServer.ListenAndServe()
 }

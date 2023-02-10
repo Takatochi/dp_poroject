@@ -64,7 +64,7 @@ const infoLoader = (port)=>{
             setTimeout(()=>{
                 $('.js-value').text(pastValue);
             },3000)
-            appendTable(port)
+            appendTable(port).finally()
         })
     });
 }
@@ -73,5 +73,6 @@ const styleUse =(serverData)=>{
     const loader =document.querySelector('.file_loader')
     if (ServerActivity.has(serverData.get(0).ServerName)){
         loader.style.display='block';
+        appendTable(serverData.get(0).ServerPort).finally()
     }
 }

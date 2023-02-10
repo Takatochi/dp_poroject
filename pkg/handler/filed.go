@@ -157,24 +157,26 @@ func (h *Index) GetTableWITHPort(ctx *gin.Context) {
 		ctx.String(http.StatusInternalServerError, fmt.Sprintf("problem with connect : %s", err.Error()))
 		return
 	}
+
 	allTables, err := retrieveAllDataFromAllTables(bd)
 	if err != nil {
 		ctx.JSON(http.StatusConflict, gin.H{"error": "server not found connect with bd"})
 		logger.Infof("server not found connect with bd %d", port)
 		return
 	}
-	//listTables, err := showTables(bd)
-	//if err != nil {
-	//	ctx.JSON(http.StatusNotFound, gin.H{"error": "server not found connect with bd"})
-	//	logger.Infof("server not found connect with bd %d", port)
-	//	return
-	//}
+
 	typeTables, err := retrieveVarTypeTables(bd)
 	if err != nil {
 		ctx.JSON(http.StatusBadGateway, gin.H{"error": "server not found connect with bd"})
 		logger.Infof("server not found connect with bd %d", port)
 		return
 	}
+	if allTables == nil || typeTables == nil {
+		ctx.JSON(http.StatusFound, gin.H{"error": "server not found data || or not loaded data file", "type": "warning"})
+		logger.Infof("server not found data %d", port)
+		return
+	}
+
 	ctx.JSON(http.StatusOK, gin.H{"info": "File uploaded successfully", "type": typeTables, "data": allTables})
 
 }
@@ -292,12 +294,13 @@ func retrieveVarTypeTables(db *sql.DB) ([]model.DataModelTypeTables, error) {
 			}
 			var сolumnsBL = make(map[string]interface{})
 			//var data []model.Internal
+
 			for i, column := range columns {
 				сolumnsBL[column] = columnTypes[i].DatabaseTypeName()
-
 			}
 			//data = append(data, model.Internal{ID: -1, Columns: сolumnsBL})
 			DataModelTypeTables.Var = model.Internal{ID: -1, Columns: сolumnsBL}
+
 		}
 
 		DataModelTypeTablesList = append(DataModelTypeTablesList, DataModelTypeTables)

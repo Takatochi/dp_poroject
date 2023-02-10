@@ -64,4 +64,17 @@ const sendFile = async (file,port)=>{
 
 const shower = (port)=>{return axios.get(`/Server/Show/${port}`)}
 
+// axios.get('/start', {
+//     params: {
+//         method: 'GET',
+//         path: '/some-path'
+//     }
+// })
+//     .then(function (response) {
+//         console.log(response.data);
+//     })
+//     .catch(function (error) {
+//         console.log(error);
+//     });
+
 export {listServer,getNewServer,initServer,deleteServer,startServer,stopServer, sendFile,shower,ServerActivity}

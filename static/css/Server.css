@@ -3,7 +3,20 @@ div> a{
     font-size: calc(1.25rem + .5vw);
     margin-left: 5px;
 }
+.bd-flush{
+    position: relative;
+    padding: 1rem;
+    margin: 1rem 1rem 0;
+    border: solid #000;;
+    border-width: 1px 0 0;
 
+}
+
+#collapsed_btn{
+    --bs-accordion-active-color: white;
+    --bs-accordion-active-bg:#000;
+    --bs-accordion-btn-focus-border-color:#000;
+}
 /*file loader input*/
 .file_loader .form-group{padding:1em;margin:1em}
 .file_loader input[type=file]{outline:0;opacity:0;pointer-events:none;user-select:none}
