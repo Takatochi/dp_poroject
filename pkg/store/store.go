@@ -4,9 +4,9 @@ import (
 	"project/app/model"
 )
 
-type ListenStore interface {
-	Store
-}
+//type ListenStore interface {
+//	Store
+//}
 
 // UserRepository ...
 type UserRepository interface {

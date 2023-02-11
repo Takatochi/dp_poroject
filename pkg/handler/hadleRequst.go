@@ -25,7 +25,7 @@ type ServerConfig struct {
 type Handler struct {
 	router *gin.Engine
 	store  StoreBD.Store
-	stores StoreBD.ListenStore
+	//stores StoreBD.ListenStore
 }
 type Index struct {
 	Handler *Handler
@@ -37,7 +37,7 @@ func NewHandler(store StoreBD.Store) *Handler {
 	return &Handler{
 		router: gin.New(),
 		store:  store,
-		stores: store,
+		//stores: store,
 	}
 
 }
@@ -53,6 +53,7 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func (h *Index) Index(ctx *gin.Context) {
 
 	ctx.Request.ParseForm()
+	//h.Handler.router.GET("/vs", h.Handler.test)
 	h.Handler.createGETServer("/st", "/data", h.Handler.test)
 	get := ctx.Request.Form
 	ctx.HTML(http.StatusOK, "index", gin.H{
@@ -65,7 +66,7 @@ func (h *Index) Index(ctx *gin.Context) {
 func (h *Index) New(ctx *gin.Context) {
 	//stores, err := h.Handler.stores.StoreBD().Server().Find()
 
-	store, err := h.Handler.stores.Server().Find()
+	store, err := h.Handler.store.Server().Find()
 	if err != nil {
 		ctx.JSON(http.StatusNotExtended, err)
 		logger.Error(err)

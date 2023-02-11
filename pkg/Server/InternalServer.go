@@ -22,8 +22,6 @@ func NewInternalServer(id int) *InternalServer {
 }
 func (s *InternalServer) Run(port string) {
 
-	info := s.router.Routes()
-	log.Print(info)
 	s.server.HTTPServer(port, s.router02())
 
 }
@@ -31,7 +29,7 @@ func (s *InternalServer) router02() *gin.Engine {
 
 	s.router.Use(gin.Recovery())
 
-	s.router.GET("/", func(c *gin.Context) {
+	s.router.Any("/", func(c *gin.Context) {
 		c.JSON(
 			http.StatusOK,
 			gin.H{
@@ -40,6 +38,7 @@ func (s *InternalServer) router02() *gin.Engine {
 			},
 		)
 	})
-
+	info := s.router.Routes()
+	log.Print(info)
 	return s.router
 }

@@ -21,7 +21,8 @@ type Server struct {
 func (s *Server) HTTPServer(port string, router *gin.Engine) error {
 	httpServer, err := s.httpServer.HTTPServer(port, router)
 
-	s.httpNet = httpServer
+	s = &Server{httpServer: s.httpServer, httpNet: *httpServer}
+	//s.httpNet = *httpServer
 	return err
 }
 func (s *Server) Run(config *Config, had *handler.Handler) error {
