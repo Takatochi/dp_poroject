@@ -52,9 +52,9 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 // Index curl  -X GET http://localhost:8088/
 func (h *Index) Index(ctx *gin.Context) {
 
-	ctx.Request.ParseForm()
-	//h.Handler.router.GET("/vs", h.Handler.test)
-	h.Handler.createGETServer("/st", "/data", h.Handler.test)
+	//ctx.Request.ParseForm()
+	//h.Handler.router.GET("/vs", h.fs)
+
 	get := ctx.Request.Form
 	ctx.HTML(http.StatusOK, "index", gin.H{
 		"Rget": get,
@@ -144,7 +144,9 @@ func (h *Index) StartVirtualServer(ctx *gin.Context) {
 		ctx.JSON(http.StatusTooManyRequests, gin.H{"error": fmt.Sprintf("Server with port %d already use", serverConfig.Port)})
 		return
 	}
+	port := strconv.Itoa(port.GetPort())
 	errCh := make(chan error)
+
 	var wg sync.WaitGroup
 	wg.Add(1)
 	go func() {
@@ -155,11 +157,22 @@ func (h *Index) StartVirtualServer(ctx *gin.Context) {
 			errCh <- err
 			return
 		}
-		close(errCh)
+
 		h.mu.Lock()
 		ServerTree = *newTree
 		h.mu.Unlock()
 
+		go func() {
+
+			err = h.Handler.createAnyServer(port, "/", "/", functionTrain(serverConfig))
+			if err != nil {
+				errCh <- err
+				ctx.JSON(http.StatusBadGateway, gin.H{"error": "problem with start the server http"})
+				return
+			}
+
+		}()
+		close(errCh)
 		ctx.JSON(http.StatusOK, gin.H{"message": fmt.Sprintf("Server with port %d start", serverConfig.Port)})
 		logger.Infof("Server with port %d start", serverConfig.Port)
 

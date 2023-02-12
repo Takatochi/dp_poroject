@@ -2,43 +2,49 @@ package handler
 
 import (
 	"github.com/gin-gonic/gin"
+	"net/http"
+	"project/pkg/Database/VirtualSql"
 	intternal "project/pkg/Server"
+	"project/pkg/handler/mapHadler"
+	"project/pkg/logger"
 )
 
-func (h *Handler) createGETServer(group, dir string, handlers gin.HandlerFunc) {
+func (h *Handler) createAnyServer(port, group, dir string, handlers gin.HandlerFunc) error {
+	//handlers gin.HandlerFunc
+	//port := strconv.Itoa(port.GetPort())
 
-	go func() {
-		r := intternal.NewInternalServer(0)
-		r.Run("8086")
-	}()
-
-}
-
-func (h *Handler) createPOSTServer(group, dir string, handlers gin.HandlerFunc) {
-	data := h.router.Group(group)
-	{
-		data.GET(dir, handlers)
+	r := intternal.NewInternalServer(0, port)
+	err := r.Run(group, dir, handlers)
+	if err != nil {
+		return err
 	}
-}
-func (h *Handler) test(ctx *gin.Context) {
-	//var req struct {
-	//	Method string `json:"method"`
-	//	Path   string `json:"path"`
-	//}
-	//fmt.Print(req.Method)
-	//if err := ctx.ShouldBindJSON(&req); err != nil {
-	//	ctx.JSON(http.StatusBadRequest, gin.H{
-	//		"error": err.Error(),
-	//	})
-	//	return
-	//}
-	ctx.JSON(200, gin.H{
-		"message": "Dynamic API is running",
-	})
-}
 
-func handle(c *gin.Context) {
-	c.JSON(200, gin.H{
-		"message": "Dynamic API is running",
-	})
+	//log.Print(port)
+	return nil
+}
+func functionTrain(cfg *ServerConfig) gin.HandlerFunc {
+	var store *VirtualSql.VirtualMySQLDatabase
+
+	return func(ctx *gin.Context) {
+		server, found := ServerTree.Get(int(cfg.Port))
+		if server == nil {
+			logger.Errorf("server is nil %d", cfg.Port)
+			return
+		}
+		if !found {
+			logger.Infof("Server not found port %d", cfg.Port)
+			return
+		}
+		bd, err := openVirtualSql(store, server.(mapHadler.ListServerSql).Config)
+		if err != nil {
+			return
+		}
+		allTables, err := retrieveAllDataFromAllTables(bd)
+		if err != nil {
+
+			return
+		}
+		ctx.JSON(http.StatusOK, gin.H{"status": "ok", "data": allTables})
+	}
+
 }

@@ -2,43 +2,42 @@ package intternal
 
 import (
 	"github.com/gin-gonic/gin"
-	"log"
-	"net/http"
 	"project/pkg/HttpServer"
+	"project/pkg/logger"
 )
 
 type InternalServer struct {
 	Id     int
 	router *gin.Engine
 	server HttpServer.Server
+	port   string
 }
 
-func NewInternalServer(id int) *InternalServer {
+func NewInternalServer(id int, port string) *InternalServer {
 	return &InternalServer{
 		Id:     id,
 		router: gin.New(),
+		port:   port,
 	}
 
 }
-func (s *InternalServer) Run(port string) {
+func (s *InternalServer) Run(group, dir string, handlers gin.HandlerFunc) error {
 
-	s.server.HTTPServer(port, s.router02())
+	srv := new(HttpServer.Server)
+	logger.Info(s.port)
+	_, err := srv.HTTPServer(s.port, s.RouterVp(group, dir, handlers))
+	if err != nil {
+		return err
+	}
 
+	return nil
 }
-func (s *InternalServer) router02() *gin.Engine {
+func (s *InternalServer) RouterVp(group, dir string, handlers gin.HandlerFunc) *gin.Engine {
 
 	s.router.Use(gin.Recovery())
 
-	s.router.Any("/", func(c *gin.Context) {
-		c.JSON(
-			http.StatusOK,
-			gin.H{
-				"code":  http.StatusOK,
-				"error": "Welcome server 02",
-			},
-		)
-	})
-	info := s.router.Routes()
-	log.Print(info)
+	s.router.Any(dir, handlers)
+	//info := s.router.Routes()
+	//log.Print(info)
 	return s.router
 }
